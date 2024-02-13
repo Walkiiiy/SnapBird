@@ -5,14 +5,8 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import HomeScreen from './view/Home';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import MeScreen from './view/Me';
+import ChatScreen from './view/Chat';
 function DetailsScreen() {
-  return (
-    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <Text>Details Screen</Text>
-    </View>
-  );
-}
-function SnapScreen() {
   return (
     <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
       <Text>Details Screen</Text>
@@ -26,14 +20,18 @@ function App() {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen
-          name="Snap"
-          component={SnapScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
           name="Home"
           component={HomeScreen}
           options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Chat"
+          component={ChatScreen}
+          options={{
+            headerTitle: '',
+            headerTransparent: true,
+            headerTintColor: 'white',
+          }}
         />
         <Stack.Screen
           name="Me"
