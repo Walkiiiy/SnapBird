@@ -7,7 +7,6 @@ import {
   Composer,
 } from 'react-native-gifted-chat';
 import {ActivityIndicator, ScrollView} from 'react-native';
-import SendMessageButton from '../componments/SendMessageButton';
 import {
   View,
   Text,
@@ -18,7 +17,7 @@ import {
   Keyboard,
 } from 'react-native';
 import PicShow from '../componments/PicShow';
-
+import UploadImgButton from '../componments/UploadButton';
 export default function Example({route, navigation}) {
   const {firstMessage, imageUriPass} = route.params;
 
@@ -114,7 +113,7 @@ export default function Example({route, navigation}) {
                 style={{height: 50, width: 50}}></Image>
             </View>
           ) : (
-            <View style={styles.picArea}>
+            <View>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 {imageUri.map(uri => (
                   <PicShow
@@ -126,6 +125,9 @@ export default function Example({route, navigation}) {
               </ScrollView>
             </View>
           )}
+          <View style={styles.uploadButtonContainer}>
+            <UploadImgButton onPress={() => {}}></UploadImgButton>
+          </View>
         </View>
         <View style={styles.activityIndicatorContainer}>
           {showActivativeIndicator ? (
@@ -203,7 +205,8 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   picArea: {
-    flex: 5, // flex: 1 表示这部分会占据可用空间的一半
+    flex: 5,
+    position: 'relative',
   },
   chatArea: {
     flex: 8,
@@ -227,5 +230,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  imageIcon: {},
+  uploadButtonContainer: {
+    width: 50,
+    height: 50,
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+  },
 });
