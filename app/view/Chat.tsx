@@ -62,7 +62,7 @@ export default function Example({route, navigation}) {
     setMessages(previousMessages =>
       GiftedChat.append(previousMessages, messages),
     );
-    await wait(2000);
+    await wait(1500);
     setMessages(previousMessages =>
       GiftedChat.append(previousMessages, [
         {

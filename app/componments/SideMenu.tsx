@@ -12,14 +12,9 @@ import {
 
 const {width, height} = Dimensions.get('window');
 
-type Props = {
-  visible: boolean;
-  onClose: () => void;
-};
-
 const menuItems = ['账户', 'AI助手', '历史记录', '设置']; // 示例菜单项
 
-const RightSideMenu: React.FC<Props> = ({visible, onClose}) => {
+function RightSideMenu({visible, onClose, onChoose}) {
   return (
     <Modal
       animationType="fade"
@@ -45,7 +40,7 @@ const RightSideMenu: React.FC<Props> = ({visible, onClose}) => {
             <TouchableOpacity
               key={index}
               onPress={() => {
-                console.log('pressed menu item', index);
+                onChoose(index);
               }}
               style={{
                 width: width * 0.65,
@@ -65,7 +60,7 @@ const RightSideMenu: React.FC<Props> = ({visible, onClose}) => {
       </View>
     </Modal>
   );
-};
+}
 
 const styles = StyleSheet.create({
   centeredView: {

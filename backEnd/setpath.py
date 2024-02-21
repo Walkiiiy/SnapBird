@@ -1,0 +1,6 @@
+inputPath = './back/'
+picPath = './back/pics/'
+pptPath = './back/ppt/'
+wordPath = './back/word/'
+excelPath = './back/excel/'
+pdfPath = './back/pdf/'

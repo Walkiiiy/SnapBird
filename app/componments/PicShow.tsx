@@ -13,8 +13,8 @@ const SquareImageWithCloseButton = ({imageUrl, onClose}) => {
 const styles = StyleSheet.create({
   container: {
     position: 'relative', // 为了绝对定位关闭按钮
-    width: 140, // 图片宽度
-    height: 140, // 图片高度（和宽度相同，形成正方形）
+    width: 120, // 图片宽度
+    height: 120, // 图片高度（和宽度相同，形成正方形）
     margin: 15,
   },
   image: {

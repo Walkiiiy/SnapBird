@@ -20,12 +20,7 @@ const options = [
   // ... 更多选项
 ];
 
-const handleSelect = (id: string) => {
-  console.log(`Selected option id: ${id}`);
-  // 根据需要处理选择
-};
-
-const ScrollableButtonSelector = () => {
+export default function ScrollableButtonSelector({handleSelect}) {
   return (
     <ScrollView
       horizontal
@@ -42,7 +37,7 @@ const ScrollableButtonSelector = () => {
       ))}
     </ScrollView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -72,5 +67,3 @@ const styles = StyleSheet.create({
     color: 'white',
   },
 });
-
-export default ScrollableButtonSelector;

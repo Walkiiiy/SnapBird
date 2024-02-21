@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Keyboard,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import SendMessageButton from '../componments/SendMessageButton';
 import ShortCut from '../componments/ShortCut';
@@ -26,9 +27,16 @@ export default function HomeScreen({navigation}) {
   const [modalVisible, setModalVisible] = React.useState(true);
   const [menuVisible, setMenuVisible] = React.useState(false);
   const [imageUri, setImageUri] = React.useState([]);
+  const [outcomeImage, setoutcomImage] = React.useState([]);
   const [picVisible, setPicVisible] = React.useState(false);
   const [uploadMenuVisible, setUploadMenuVisible] = React.useState(false);
   const [keyboardShown, setKeyboardShown] = React.useState(false);
+  const [title1, setTitle1] = React.useState('快速开始');
+  const [title2, setTitle2] = React.useState('ShortCut');
+  const [showActivativeIndicator, setShowActivativeIndicator] =
+    React.useState(false);
+
+  //键盘事件监听
   React.useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
@@ -51,6 +59,47 @@ export default function HomeScreen({navigation}) {
   }, []);
 
   // 自定函数
+  function onChooseSideMenu(id) {
+    if (id == 1) {
+      navigation.navigate('Chat', {
+        firstMessage: '请帮我……',
+        imageUriPass: imageUri,
+      });
+    }
+  }
+  function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+  //处理shortcut选择
+  async function shortCut(id: string) {
+    console.log(`Selected option id: ${id}`);
+    console.log(`Selected option id: ${id}`);
+    if (imageUri.length == 0) {
+      setTitle2('请先上传图片或文件！！');
+      await wait(1500);
+      setTitle2('ShortCut');
+    } else {
+      setShowActivativeIndicator(true);
+      await wait(1500);
+      setShowActivativeIndicator(false);
+      setoutcomImage(imageUri);
+    }
+  }
+  //处理快速开始选择
+  async function quickStart(id: string) {
+    console.log(`Selected option id: ${id}`);
+    if (imageUri.length == 0) {
+      setTitle1('请先上传图片或文件！！');
+      await wait(1500);
+      setTitle1('快速开始');
+    } else {
+      setShowActivativeIndicator(true);
+      await wait(1500);
+      setShowActivativeIndicator(false);
+      setoutcomImage(imageUri);
+    }
+  }
+  //发送消息，转ai界面
   function sendMessage() {
     console.log('sendMessage');
     Keyboard.dismiss();
@@ -62,8 +111,24 @@ export default function HomeScreen({navigation}) {
     }
     setText('');
   }
+  //从图片uri列表和outcome列表删除元素
   function delImg(uri) {
     setImageUri(currentImageUris => {
+      const index = currentImageUris.findIndex(element => element === uri);
+      if (index !== -1) {
+        // 创建数组的副本
+        const tempArray = [...currentImageUris];
+        // 删除指定索引的元素
+        tempArray.splice(index, 1);
+        // 返回新数组作为新状态
+        if (tempArray.length == 0) {
+          setPicVisible(false);
+        }
+        return tempArray;
+      }
+      return currentImageUris; // 如果没有找到，返回原始数组
+    });
+    setoutcomImage(currentImageUris => {
       const index = currentImageUris.findIndex(element => element === uri);
       if (index !== -1) {
         // 创建数组的副本
@@ -143,7 +208,11 @@ export default function HomeScreen({navigation}) {
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
       />
-      <SideMenu visible={menuVisible} onClose={() => setMenuVisible(false)} />
+      <SideMenu
+        visible={menuVisible}
+        onClose={() => setMenuVisible(false)}
+        onChoose={onChooseSideMenu}
+      />
 
       {/* 顶部标题栏，菜单按钮 */}
       <View style={styles.topBar}>
@@ -176,16 +245,30 @@ export default function HomeScreen({navigation}) {
               <PicShow key={uri} imageUrl={uri} onClose={() => delImg(uri)} />
             ))}
           </ScrollView>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {outcomeImage.map(uri => (
+              <PicShow key={uri} imageUrl={uri} onClose={() => delImg(uri)} />
+            ))}
+          </ScrollView>
+          <View style={styles.activityIndicatorContainer}>
+            {showActivativeIndicator ? (
+              <ActivityIndicator
+                style={styles.activityIndicator}
+                size="small"
+                color="#0084ff"
+              />
+            ) : null}
+          </View>
         </View>
       )}
 
       {/* 快速开始 */}
       <View style={styles.shortCutArea}>
         <View style={styles.functionTitleArea}>
-          <Text style={styles.functionTitle}>快速开始</Text>
+          <Text style={styles.functionTitle}>{title1}</Text>
         </View>
         <View style={styles.selectionArea}>
-          <Functions />
+          <Functions handleSelect={quickStart} />
         </View>
       </View>
 
@@ -206,10 +289,10 @@ export default function HomeScreen({navigation}) {
       ) : (
         <View style={styles.shortCutArea}>
           <View style={styles.functionTitleArea}>
-            <Text style={styles.functionTitle}>ShortCut</Text>
+            <Text style={styles.functionTitle}>{title2}</Text>
           </View>
           <View style={styles.selectionArea}>
-            <ShortCut />
+            <ShortCut handleSelect={shortCut} />
           </View>
         </View>
       )}
@@ -309,5 +392,11 @@ const styles = StyleSheet.create({
   },
   functionTitleArea: {
     flex: 1,
+  },
+  activityIndicatorContainer: {
+    flex: 1,
+  },
+  activityIndicator: {
+    margin: 5,
   },
 });
