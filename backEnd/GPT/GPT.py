@@ -2,7 +2,7 @@ from openai import OpenAI
 from GPT.key import getKey
 client = OpenAI(
     # This is the default and can be omitted
-    api_key=getKey,
+    api_key=getKey(),
 )
 
 
