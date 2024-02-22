@@ -21,7 +21,7 @@ import PicShow from '../componments/PicShow';
 import UploadImgButton from '../componments/UploadButton';
 export default function Chat({route, navigation}) {
   //变量
-  const url = 'http://127.0.0.1:5000/chat?message=';
+  const url = 'http://10.0.2.2:5000/chat?message=';
   const {firstMessage, imageUriPass} = route.params;
 
   const snapbird = {
@@ -67,7 +67,8 @@ export default function Chat({route, navigation}) {
       // 发送GET请求到指定的URL
       const response = await axios.get(chatUrl);
       // 打印响应数据
-      console.log(response.data);
+      console.log(response.data.response);
+      return response.data.response;
     } catch (error) {
       if (error.response) {
         // 服务器端返回了除了2xx以外的状态码
@@ -83,18 +84,19 @@ export default function Chat({route, navigation}) {
       }
       console.log('Config:', error.config); // 打印请求的配置信息
     }
+    return 'error';
   };
   const onSend = useCallback(async (messages = []) => {
     setShowActivativeIndicator(true);
     setMessages(previousMessages =>
       GiftedChat.append(previousMessages, messages),
     );
-    await chat(messages[0].text);
+    const response = await chat(messages[0].text);
     setMessages(previousMessages =>
       GiftedChat.append(previousMessages, [
         {
           _id: Date(),
-          text: '嘿嘿嘿',
+          text: response,
           createdAt: new Date(),
           user: snapbird,
         },
