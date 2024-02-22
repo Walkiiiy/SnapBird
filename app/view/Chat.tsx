@@ -16,9 +16,12 @@ import {
   TouchableOpacity,
   Keyboard,
 } from 'react-native';
+import axios from 'axios';
 import PicShow from '../componments/PicShow';
 import UploadImgButton from '../componments/UploadButton';
-export default function Example({route, navigation}) {
+export default function Chat({route, navigation}) {
+  //变量
+  const url = 'http://127.0.0.1:5000/chat?message=';
   const {firstMessage, imageUriPass} = route.params;
 
   const snapbird = {
@@ -30,6 +33,7 @@ export default function Example({route, navigation}) {
   const [showActivativeIndicator, setShowActivativeIndicator] = useState(false);
   const [picVisible, setPicVisible] = useState(false);
   const [imageUri, setImageUri] = useState(imageUriPass);
+  //预处理
   useEffect(() => {
     const firstChat = [
       {
@@ -56,13 +60,36 @@ export default function Example({route, navigation}) {
       setPicVisible(true);
     }
   }, []);
-
+  //自定函数
+  const chat = async message => {
+    const chatUrl = url + message;
+    try {
+      // 发送GET请求到指定的URL
+      const response = await axios.get(chatUrl);
+      // 打印响应数据
+      console.log(response.data);
+    } catch (error) {
+      if (error.response) {
+        // 服务器端返回了除了2xx以外的状态码
+        console.log('Data:', error.response.data);
+        console.log('Status:', error.response.status);
+        console.log('Headers:', error.response.headers);
+      } else if (error.request) {
+        // 请求已发出，但没有收到响应
+        console.log('Request:', error.request);
+      } else {
+        // 发送请求时出了点问题
+        console.log('Error:', error.message);
+      }
+      console.log('Config:', error.config); // 打印请求的配置信息
+    }
+  };
   const onSend = useCallback(async (messages = []) => {
     setShowActivativeIndicator(true);
     setMessages(previousMessages =>
       GiftedChat.append(previousMessages, messages),
     );
-    await wait(1500);
+    await chat(messages[0].text);
     setMessages(previousMessages =>
       GiftedChat.append(previousMessages, [
         {
@@ -73,7 +100,6 @@ export default function Example({route, navigation}) {
         },
       ]),
     );
-    console.log(messages);
     setShowActivativeIndicator(false);
   }, []);
 

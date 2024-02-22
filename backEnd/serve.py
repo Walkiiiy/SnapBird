@@ -14,11 +14,14 @@ CORS(app, supports_credentials=True)
 
 @app.route('/chat', methods=['GET'])
 def gpt_chat():
-    message = request.args.get('message')
-    if not message:
-        return jsonify({'error': 'no message carried!'})
-    response = chat(message)
-    return jsonify({'response': response})
+    try:
+        message = request.args.get('message')
+        if not message:
+            return jsonify({'error': 'no message carried!'})
+        response = chat(message)
+        return jsonify({'response': response})
+    except Exception as e:
+        return jsonify({'error': e})
 
 
 @app.route('/upload', methods=['POST'])  # 逐个上传文件，根据文件类型分类存储

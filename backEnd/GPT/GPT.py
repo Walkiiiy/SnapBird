@@ -1,8 +1,8 @@
 from openai import OpenAI
-
+from GPT.key import getKey
 client = OpenAI(
     # This is the default and can be omitted
-    api_key="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"
+    api_key=getKey,
 )
 
 
