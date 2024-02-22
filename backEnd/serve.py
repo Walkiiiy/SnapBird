@@ -6,10 +6,19 @@ import os
 
 from setpath import *
 from utils import determine_file_type
-
+from GPT.GPT import chat
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
+
+
+@app.route('/chat', methods=['GET'])
+def gpt_chat():
+    message = request.args.get('message')
+    if not message:
+        return jsonify({'error': 'no message carried!'})
+    response = chat(message)
+    return jsonify({'response': response})
 
 
 @app.route('/upload', methods=['POST'])  # 逐个上传文件，根据文件类型分类存储
