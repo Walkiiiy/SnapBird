@@ -12,7 +12,7 @@ type ButtonOption = {
   label: string;
 };
 const options = [
-  {id: '1', label: '文本扫描'},
+  {id: '1', label: '文本扫描OCR'},
   {id: '2', label: '证件照片制作'},
   {id: '3', label: '文件格式转换'},
   {id: '4', label: '水印'},
@@ -29,7 +29,7 @@ export default function ScrollableButtonSelector({handleSelect}) {
         <TouchableOpacity
           key={option.id}
           style={styles.button}
-          onPress={() => handleSelect(option.id)}>
+          onPress={() => handleSelect(option.label)}>
           <Text style={styles.buttonText}>{option.label}</Text>
           <Text style={[styles.buttonText, {color: 'grey'}]}>icon</Text>
         </TouchableOpacity>

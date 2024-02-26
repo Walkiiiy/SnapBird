@@ -10,24 +10,40 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import SendMessageButton from '../componments/SendMessageButton';
+import {launchImageLibrary, launchCamera} from 'react-native-image-picker';
+import DocumentPicker from 'react-native-document-picker';
+import {useFocusEffect} from '@react-navigation/native';
+import axios from 'axios';
+
 import ShortCut from '../componments/ShortCut';
 import UploadButton from '../componments/UploadButton';
 import Functions from '../componments/Functions';
 import Notice from '../componments/Notice';
 import SideMenu from '../componments/SideMenu';
-import {launchImageLibrary, launchCamera} from 'react-native-image-picker';
+import SendMessageButton from '../componments/SendMessageButton';
 import PicShow from '../componments/PicShow';
 import UploadMenu from '../componments/UploadMenu';
-import DocumentPicker from 'react-native-document-picker';
+import * as FileShow from '../componments/FileShow';
+
+import {
+  UserContext,
+  FileOutcomeContext,
+  FileUploadContext,
+  FileTypeContext,
+} from '../Context';
+
+import {ocrInterface, uploadFile, delFileInterface} from '../interfaces/main';
 
 export default function HomeScreen({navigation}) {
   // 动态变量
+  const {user, setUser} = React.useContext(UserContext);
+  const {fileOutcome, setFileOutcome} = React.useContext(FileOutcomeContext);
+  const {fileUpload, setFileUpload} = React.useContext(FileUploadContext);
+  const {fileType, setFileType} = React.useContext(FileTypeContext);
+
   const [text, setText] = React.useState('');
   const [modalVisible, setModalVisible] = React.useState(true);
   const [menuVisible, setMenuVisible] = React.useState(false);
-  const [imageUri, setImageUri] = React.useState([]);
-  const [outcomeImage, setoutcomImage] = React.useState([]);
   const [picVisible, setPicVisible] = React.useState(false);
   const [uploadMenuVisible, setUploadMenuVisible] = React.useState(false);
   const [keyboardShown, setKeyboardShown] = React.useState(false);
@@ -35,7 +51,8 @@ export default function HomeScreen({navigation}) {
   const [title2, setTitle2] = React.useState('ShortCut');
   const [showActivativeIndicator, setShowActivativeIndicator] =
     React.useState(false);
-
+  const [showTextBox, setShowTextBox] = React.useState(false);
+  const [textBoxvalue, setTextBoxValue] = React.useState('');
   //键盘事件监听
   React.useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -57,48 +74,93 @@ export default function HomeScreen({navigation}) {
       keyboardDidHideListener.remove();
     };
   }, []);
-
+  //页面焦点监听
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('home获得焦点');
+      if (fileUpload.length == 0) {
+        setPicVisible(false);
+      }
+      return () => {
+        console.log('home页面失去焦点');
+      };
+    }, []),
+  );
   // 自定函数
+  function getFileType(fileName) {
+    const extension = fileName.split('.').pop().toLowerCase();
+    switch (extension) {
+      case 'pdf':
+        return 'PDF Document';
+      case 'doc':
+      case 'docx':
+        return 'Word Document';
+      case 'xls':
+      case 'xlsx':
+        return 'Excel Spreadsheet';
+      case 'ppt':
+      case 'pptx':
+        return 'PowerPoint Presentation';
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+      case 'gif':
+      case 'bmp':
+      case 'svg':
+        return 'Image';
+      default:
+        return 'Unknown File Type';
+    }
+  }
+
   function onChooseSideMenu(id) {
     if (id == 1) {
       navigation.navigate('Chat', {
         firstMessage: '请帮我……',
-        imageUriPass: imageUri,
+        fileUploadPass: fileUpload,
       });
     }
   }
   function wait(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
-  //处理shortcut选择
-  async function shortCut(id: string) {
-    console.log(`Selected option id: ${id}`);
-    console.log(`Selected option id: ${id}`);
-    if (imageUri.length == 0) {
-      setTitle2('请先上传图片或文件！！');
-      await wait(1500);
-      setTitle2('ShortCut');
-    } else {
-      setShowActivativeIndicator(true);
-      await wait(1500);
-      setShowActivativeIndicator(false);
-      setoutcomImage(imageUri);
-    }
+  //处理shortcut选择,转ai界面
+  async function shortCut(message: string) {
+    console.log(`Selected option : ${message}`);
+    console.log(`Selected option : ${message}`);
+    setTitle2('Snap！！');
+    await wait(300);
+    navigation.navigate('Chat', {
+      firstMessage: message,
+      fileUploadPass: fileUpload,
+    });
   }
   //处理快速开始选择
-  async function quickStart(id: string) {
-    console.log(`Selected option id: ${id}`);
-    if (imageUri.length == 0) {
+  async function quickStart(option: string) {
+    console.log(`Selected option: ${option}`);
+    if (fileUpload.length == 0) {
       setTitle1('请先上传图片或文件！！');
       await wait(1500);
       setTitle1('快速开始');
     } else {
       setShowActivativeIndicator(true);
-      await wait(1500);
+      if (option == '文本扫描OCR') {
+        const outcome = await ocrInterface();
+        if (outcome == 'server returned a bad signal!') {
+          console.log('server returned a bad signal!');
+        } else {
+          for (let result in outcome) {
+            setTextBoxValue(outcome[0].texts.join('\n'));
+            setShowTextBox(true);
+          }
+        }
+      } else {
+        setFileOutcome(fileUpload);
+      }
       setShowActivativeIndicator(false);
-      setoutcomImage(imageUri);
     }
   }
+
   //发送消息，转ai界面
   function sendMessage() {
     console.log('sendMessage');
@@ -106,18 +168,20 @@ export default function HomeScreen({navigation}) {
     if (text != '') {
       navigation.navigate('Chat', {
         firstMessage: text,
-        imageUriPass: imageUri,
+        fileUploadPass: fileUpload,
       });
     }
     setText('');
   }
   //从图片uri列表和outcome列表删除元素
-  function delImg(uri) {
-    setImageUri(currentImageUris => {
-      const index = currentImageUris.findIndex(element => element === uri);
+  function delfile(uri) {
+    console.log(fileUpload);
+    setFileUpload(currentfileUploads => {
+      const index = currentfileUploads.findIndex(element => element === uri);
+      delFileInterface(index);
       if (index !== -1) {
         // 创建数组的副本
-        const tempArray = [...currentImageUris];
+        const tempArray = [...currentfileUploads];
         // 删除指定索引的元素
         tempArray.splice(index, 1);
         // 返回新数组作为新状态
@@ -126,13 +190,13 @@ export default function HomeScreen({navigation}) {
         }
         return tempArray;
       }
-      return currentImageUris; // 如果没有找到，返回原始数组
+      return currentfileUploads; // 如果没有找到，返回原始数组
     });
-    setoutcomImage(currentImageUris => {
-      const index = currentImageUris.findIndex(element => element === uri);
+    setFileOutcome(currentfileUploads => {
+      const index = currentfileUploads.findIndex(element => element === uri);
       if (index !== -1) {
         // 创建数组的副本
-        const tempArray = [...currentImageUris];
+        const tempArray = [...currentfileUploads];
         // 删除指定索引的元素
         tempArray.splice(index, 1);
         // 返回新数组作为新状态
@@ -141,7 +205,7 @@ export default function HomeScreen({navigation}) {
         }
         return tempArray;
       }
-      return currentImageUris; // 如果没有找到，返回原始数组
+      return currentfileUploads; // 如果没有找到，返回原始数组
     });
   }
   function uploadImg() {
@@ -149,14 +213,18 @@ export default function HomeScreen({navigation}) {
       noData: true,
       selectionLimit: 0, // 允许用户选择任意数量的图片
     };
-    launchImageLibrary(options, response => {
-      const newUris = [];
+    launchImageLibrary(options, async response => {
       if (!response.didCancel) {
+        setShowActivativeIndicator(true);
         for (const asset of response.assets) {
-          newUris.push(asset.uri);
+          await uploadFile(asset.uri, asset.fileName);
+          setFileType(fileType =>
+            fileType.concat([getFileType(asset.fileName)]),
+          );
+          setFileUpload(fileUpload => fileUpload.concat([asset.uri]));
         }
-        console.log(newUris);
-        setImageUri(imageUri.concat(newUris));
+        console.log(fileUpload);
+        setShowActivativeIndicator(false);
         setPicVisible(true);
       }
     });
@@ -170,7 +238,7 @@ export default function HomeScreen({navigation}) {
     launchCamera(options, response => {
       console.log(response);
       if (response.assets && response.assets.length > 0) {
-        setImageUri(response.assets[0].uri);
+        setFileUpload(response.assets[0].uri);
       }
     });
   }
@@ -179,15 +247,28 @@ export default function HomeScreen({navigation}) {
     try {
       // 启动文档选择器，并设置类型为 PDF
       const res = await DocumentPicker.pick({
-        type: [DocumentPicker.types.pdf],
+        type: [
+          DocumentPicker.types.pdf,
+          DocumentPicker.types.csv,
+          DocumentPicker.types.doc,
+          DocumentPicker.types.docx,
+          DocumentPicker.types.ppt,
+          DocumentPicker.types.pptx,
+          DocumentPicker.types.xls,
+          DocumentPicker.types.xlsx,
+        ],
+        allowMultiSelection: true,
       });
 
       // res.uri 是选中文件的 URI
-      console.log(
-        `URI: ${res.uri}\nType: ${res.type}\nName: ${res.name}\nSize: ${res.size}`,
-      );
-
-      // 这里可以添加上传文件的代码
+      setShowActivativeIndicator(true);
+      for (let i in res) {
+        await uploadFile(res[i].uri, res[i].name);
+        setFileType(fileType => fileType.concat([getFileType(res[i].name)]));
+        setFileUpload(fileUpload => fileUpload.concat([res[i].uri]));
+      }
+      setShowActivativeIndicator(false);
+      setPicVisible(true);
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         // 用户取消了选择
@@ -230,7 +311,7 @@ export default function HomeScreen({navigation}) {
         </TouchableOpacity>
       </View>
 
-      {/* icon,传入图片展示部分 */}
+      {/* icon,图片展示部分 */}
       {keyboardShown ? null : !picVisible ? (
         <View style={styles.iconArea}>
           <Image
@@ -241,15 +322,81 @@ export default function HomeScreen({navigation}) {
       ) : (
         <View style={styles.picArea}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {imageUri.map(uri => (
-              <PicShow key={uri} imageUrl={uri} onClose={() => delImg(uri)} />
-            ))}
+            {fileUpload.map((uri, index) => {
+              if (fileType[index] == 'PDF Document') {
+                return (
+                  <FileShow.PdfShow key={uri} onClose={() => delfile(uri)} />
+                );
+              } else if (fileType[index] == 'Word Document') {
+                return (
+                  <FileShow.WordShow key={uri} onClose={() => delfile(uri)} />
+                );
+              } else if (fileType[index] == 'Excel Spreadsheet') {
+                return (
+                  <FileShow.ExcelShow key={uri} onClose={() => delfile(uri)} />
+                );
+              } else if (fileType[index] == 'PowerPoint Presentation') {
+                return (
+                  <FileShow.PptShow key={uri} onClose={() => delfile(uri)} />
+                );
+              } else if (fileType[index] == 'Image') {
+                return (
+                  <PicShow
+                    key={uri}
+                    imageUrl={uri}
+                    onClose={() => delfile(uri)}
+                  />
+                );
+              } else {
+                console.log('known type of file!');
+              }
+            })}
           </ScrollView>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {outcomeImage.map(uri => (
-              <PicShow key={uri} imageUrl={uri} onClose={() => delImg(uri)} />
-            ))}
-          </ScrollView>
+          {showTextBox ? (
+            <TextInput
+              style={styles.textBox}
+              editable={false}
+              value={textBoxvalue}
+              keyboardType="default" // 键盘类型
+              secureTextEntry={false} // 是否隐藏输入内容，常用于密码输入
+              multiline={true}
+            />
+          ) : (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {fileOutcome.map((uri, index) => {
+                if (fileType[index] == 'PDF Document') {
+                  return (
+                    <FileShow.PdfShow key={uri} onClose={() => delfile(uri)} />
+                  );
+                } else if (fileType[index] == 'Word Document') {
+                  return (
+                    <FileShow.WordShow key={uri} onClose={() => delfile(uri)} />
+                  );
+                } else if (fileType[index] == 'Excel Spreadsheet') {
+                  return (
+                    <FileShow.ExcelShow
+                      key={uri}
+                      onClose={() => delfile(uri)}
+                    />
+                  );
+                } else if (fileType[index] == 'PowerPoint Presentation') {
+                  return (
+                    <FileShow.PptShow key={uri} onClose={() => delfile(uri)} />
+                  );
+                } else if (fileType[index] == 'Image') {
+                  return (
+                    <PicShow
+                      key={uri}
+                      imageUrl={uri}
+                      onClose={() => delfile(uri)}
+                    />
+                  );
+                } else {
+                  console.log('known type of file!');
+                }
+              })}
+            </ScrollView>
+          )}
           <View style={styles.activityIndicatorContainer}>
             {showActivativeIndicator ? (
               <ActivityIndicator
@@ -398,5 +545,15 @@ const styles = StyleSheet.create({
   },
   activityIndicator: {
     margin: 5,
+  },
+  textBox: {
+    flex: 13,
+    height: 40,
+    margin: 7,
+    borderWidth: 2,
+    backgroundColor: '#444444',
+    borderRadius: 15,
+    borderColor: '#999999',
+    color: 'white',
   },
 });

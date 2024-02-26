@@ -17,12 +17,26 @@ import {
   Keyboard,
 } from 'react-native';
 import axios from 'axios';
+
 import PicShow from '../componments/PicShow';
 import UploadImgButton from '../componments/UploadButton';
+
+import {
+  UserContext,
+  FileOutcomeContext,
+  FileUploadContext,
+  FileTypeContext,
+} from '../Context';
+
 export default function Chat({route, navigation}) {
   //变量
   const url = 'http://10.0.2.2:5000/chat?message=';
-  const {firstMessage, imageUriPass} = route.params;
+  const {user, setUser} = React.useContext(UserContext);
+  const {fileOutcome, setFileOutcome} = React.useContext(FileOutcomeContext);
+  const {fileUpload, setFileUpload} = React.useContext(FileUploadContext);
+  const {fileType, setFileType} = React.useContext(FileTypeContext);
+
+  const {firstMessage} = route.params;
 
   const snapbird = {
     _id: 2,
@@ -32,7 +46,6 @@ export default function Chat({route, navigation}) {
   const [messages, setMessages] = useState([]);
   const [showActivativeIndicator, setShowActivativeIndicator] = useState(false);
   const [picVisible, setPicVisible] = useState(false);
-  const [imageUri, setImageUri] = useState(imageUriPass);
   //预处理
   useEffect(() => {
     const firstChat = [
@@ -56,7 +69,7 @@ export default function Chat({route, navigation}) {
       },
     ];
     onSend(firstChat);
-    if (imageUri.length != 0) {
+    if (fileUpload.length != 0) {
       setPicVisible(true);
     }
   }, []);
@@ -110,11 +123,11 @@ export default function Chat({route, navigation}) {
   }
 
   function delImg(uri) {
-    setImageUri(currentImageUris => {
-      const index = currentImageUris.findIndex(element => element === uri);
+    setFileUpload(currentfileUploads => {
+      const index = currentfileUploads.findIndex(element => element === uri);
       if (index !== -1) {
         // 创建数组的副本
-        const tempArray = [...currentImageUris];
+        const tempArray = [...currentfileUploads];
         // 删除指定索引的元素
         tempArray.splice(index, 1);
         // 返回新数组作为新状态
@@ -123,7 +136,7 @@ export default function Chat({route, navigation}) {
         }
         return tempArray;
       }
-      return currentImageUris; // 如果没有找到，返回原始数组
+      return currentfileUploads; // 如果没有找到，返回原始数组
     });
   }
 
@@ -143,7 +156,7 @@ export default function Chat({route, navigation}) {
           ) : (
             <View>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                {imageUri.map(uri => (
+                {fileUpload.map(uri => (
                   <PicShow
                     key={uri}
                     imageUrl={uri}

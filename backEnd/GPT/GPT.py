@@ -15,7 +15,6 @@ def askChatGPT(messages):
         model=MODEL,
         messages=messages,
         temperature=1)
-    print(chat_completion)
     return chat_completion.choices[0].message.content
 
 

@@ -3,6 +3,7 @@ from flask_cors import CORS
 from all import CommonOcr
 import time
 import os
+import json
 
 from setpath import *
 from utils import determine_file_type
@@ -10,6 +11,9 @@ from GPT.GPT import chat
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
+
+fileNames = []
+fileTypes = []
 
 
 @app.route('/chat', methods=['GET'])
@@ -19,7 +23,18 @@ def gpt_chat():
         if not message:
             return jsonify({'error': 'no message carried!'})
         response = chat(message)
-        return jsonify({'response': response})
+        if response:
+            try:  # 对gpt模块响应进行处理
+                print(response)
+                response = json.loads(response)
+                if response['type'] == 'operation':
+                    return jsonify({'response': '请稍后，处理结果将在文件区展示:)'})
+                elif response['type'] == 'rejection':
+                    return jsonify({'response': response['content']})
+            except Exception as e:  # 无法json化
+                return jsonify({'response': 'gpt returned an incorrect form(probably not json)', })
+        else:
+            return jsonify({'error': 'gpt session is unavilible.'})
     except Exception as e:
         return jsonify({'error': e})
 
@@ -27,8 +42,10 @@ def gpt_chat():
 @app.route('/upload', methods=['POST'])  # 逐个上传文件，根据文件类型分类存储
 def upload_file():
     uploaded_file = request.files['file']
+    fileNames.append(uploaded_file.filename)
     if uploaded_file.filename != '':
         fileType = determine_file_type(uploaded_file.filename)
+        fileTypes.append(fileType)
         if fileType == 'images':
             uploaded_file.save(picPath+uploaded_file.filename)
         elif fileType == 'ppt':
@@ -40,9 +57,31 @@ def upload_file():
         elif fileType == 'excel':
             uploaded_file.save(excelPath+uploaded_file.filename)
         else:
-            pass
+            print('unkown type of file!')
         return jsonify({'message': 'File has been uploaded successfully'})
     return jsonify({'message': 'No file was uploaded'})
+
+
+@app.route('/delFile', methods=['GET'])  # 单个删除文件
+def del_file():
+    index = int(request.args.get('index'))
+    fileType = fileTypes[index]
+    fileName = fileNames[index]
+    if fileType == 'images':
+        os.remove(picPath+fileName)
+    elif fileType == 'ppt':
+        os.remove(pptPath+fileName)
+    elif fileType == 'word':
+        os.remove(wordPath+fileName)
+    elif fileType == 'pdf':
+        os.remove(pdfPath+fileName)
+    elif fileType == 'excel':
+        os.remove(excelPath+fileName)
+    else:
+        print('unkown type of file!')
+        return jsonify({'message': 'ubkonwn file'})
+    print(fileNames)
+    return jsonify({'message': 'File has been removed successfully'})
 
 
 @app.route('/recognize', methods=['GET'])  # 批量文字识别
@@ -248,4 +287,4 @@ def word_to_img():
 
 
 if __name__ == '__main__':
-    app.run(port=5000)
+    app.run(port=5000, debug=True)

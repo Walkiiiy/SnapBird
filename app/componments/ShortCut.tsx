@@ -30,7 +30,7 @@ export default function ScrollableButtonSelector({handleSelect}) {
         <TouchableOpacity
           key={option.id}
           style={styles.button}
-          onPress={() => handleSelect(option.id)}>
+          onPress={() => handleSelect(option.label)}>
           <Text style={styles.buttonText}>{option.label}</Text>
           <Text style={[styles.buttonText, {color: 'grey'}]}>icon</Text>
         </TouchableOpacity>

@@ -6,40 +6,52 @@ import HomeScreen from './view/Home';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import MeScreen from './view/Me';
 import ChatScreen from './view/Chat';
-function DetailsScreen() {
-  return (
-    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <Text>Details Screen</Text>
-    </View>
-  );
-}
+import {
+  FileUploadContext,
+  FileOutcomeContext,
+  UserContext,
+  FileTypeContext,
+} from './Context';
+
 const Stack = createNativeStackNavigator();
 
 function App() {
+  const [user, setUser] = React.useState(null);
+  const [fileOutcome, setFileOutcome] = React.useState([]);
+  const [fileUpload, setFileUpload] = React.useState([]);
+  const [fileType, setFileType] = React.useState([]);
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="Chat"
-          component={ChatScreen}
-          options={{
-            headerTitle: '',
-            headerTransparent: true,
-            headerTintColor: 'white',
-          }}
-        />
-        <Stack.Screen
-          name="Me"
-          component={MeScreen}
-          options={{headerShown: false}}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <UserContext.Provider value={{user, setUser}}>
+      <FileOutcomeContext.Provider value={{fileOutcome, setFileOutcome}}>
+        <FileUploadContext.Provider value={{fileUpload, setFileUpload}}>
+          <FileTypeContext.Provider value={{fileType, setFileType}}>
+            <NavigationContainer>
+              <Stack.Navigator initialRouteName="Home">
+                <Stack.Screen
+                  name="Home"
+                  component={HomeScreen}
+                  options={{headerShown: false}}
+                />
+                <Stack.Screen
+                  name="Chat"
+                  component={ChatScreen}
+                  options={{
+                    headerTitle: '',
+                    headerTransparent: true,
+                    headerTintColor: 'white',
+                  }}
+                />
+                <Stack.Screen
+                  name="Me"
+                  component={MeScreen}
+                  options={{headerShown: false}}
+                />
+              </Stack.Navigator>
+            </NavigationContainer>
+          </FileTypeContext.Provider>
+        </FileUploadContext.Provider>
+      </FileOutcomeContext.Provider>
+    </UserContext.Provider>
   );
 }
 

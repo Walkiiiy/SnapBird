@@ -6,7 +6,7 @@ export default function UploadImgButton({onPress}) {
 
   const handlePress = () => {
     if (backgroundColor == '#003366') {
-      setBackgroundColor('#222222');
+      setBackgroundColor('#008080');
     } else {
       setBackgroundColor('#003366');
     }
