@@ -65,8 +65,10 @@ def upload_file():
 @app.route('/delFile', methods=['GET'])  # 单个删除文件
 def del_file():
     index = int(request.args.get('index'))
-    fileType = fileTypes[index]
-    fileName = fileNames[index]
+    print('index:', index)
+    print('fileupload:', fileNames)
+    fileType = fileTypes.pop(index)
+    fileName = fileNames.pop(index)
     if fileType == 'images':
         os.remove(picPath+fileName)
     elif fileType == 'ppt':

@@ -174,39 +174,37 @@ export default function HomeScreen({navigation}) {
     setText('');
   }
   //从图片uri列表和outcome列表删除元素
-  function delfile(uri) {
-    console.log(fileUpload);
-    setFileUpload(currentfileUploads => {
-      const index = currentfileUploads.findIndex(element => element === uri);
-      delFileInterface(index);
-      if (index !== -1) {
-        // 创建数组的副本
-        const tempArray = [...currentfileUploads];
-        // 删除指定索引的元素
+  function delfile(index) {
+    // 删除指定索引的文件上传项
+    setFileUpload(currentFileUploads => {
+      const tempArray = [...currentFileUploads];
+      if (index >= 0 && index < tempArray.length) {
         tempArray.splice(index, 1);
-        // 返回新数组作为新状态
-        if (tempArray.length == 0) {
+        if (tempArray.length === 0) {
           setPicVisible(false);
         }
-        return tempArray;
       }
-      return currentfileUploads; // 如果没有找到，返回原始数组
+      return tempArray;
     });
-    setFileOutcome(currentfileUploads => {
-      const index = currentfileUploads.findIndex(element => element === uri);
-      if (index !== -1) {
-        // 创建数组的副本
-        const tempArray = [...currentfileUploads];
-        // 删除指定索引的元素
+
+    // 删除指定索引的文件结果项
+    setFileOutcome(currentFileOutcomes => {
+      const tempArray = [...currentFileOutcomes];
+      if (index >= 0 && index < tempArray.length) {
         tempArray.splice(index, 1);
-        // 返回新数组作为新状态
-        if (tempArray.length == 0) {
-          setPicVisible(false);
-        }
-        return tempArray;
       }
-      return currentfileUploads; // 如果没有找到，返回原始数组
+      return tempArray;
     });
+
+    // 删除指定索引的文件类型项
+    setFileType(currentFileTypes => {
+      const tempArray = [...currentFileTypes];
+      if (index >= 0 && index < tempArray.length) {
+        tempArray.splice(index, 1);
+      }
+      return tempArray;
+    });
+    delFileInterface(index); // 假设这是向服务器发送删除请求的函数
   }
   function uploadImg() {
     const options = {
@@ -325,26 +323,29 @@ export default function HomeScreen({navigation}) {
             {fileUpload.map((uri, index) => {
               if (fileType[index] == 'PDF Document') {
                 return (
-                  <FileShow.PdfShow key={uri} onClose={() => delfile(uri)} />
+                  <FileShow.PdfShow key={uri} onClose={() => delfile(index)} />
                 );
               } else if (fileType[index] == 'Word Document') {
                 return (
-                  <FileShow.WordShow key={uri} onClose={() => delfile(uri)} />
+                  <FileShow.WordShow key={uri} onClose={() => delfile(index)} />
                 );
               } else if (fileType[index] == 'Excel Spreadsheet') {
                 return (
-                  <FileShow.ExcelShow key={uri} onClose={() => delfile(uri)} />
+                  <FileShow.ExcelShow
+                    key={uri}
+                    onClose={() => delfile(index)}
+                  />
                 );
               } else if (fileType[index] == 'PowerPoint Presentation') {
                 return (
-                  <FileShow.PptShow key={uri} onClose={() => delfile(uri)} />
+                  <FileShow.PptShow key={uri} onClose={() => delfile(index)} />
                 );
               } else if (fileType[index] == 'Image') {
                 return (
                   <PicShow
                     key={uri}
                     imageUrl={uri}
-                    onClose={() => delfile(uri)}
+                    onClose={() => delfile(index)}
                   />
                 );
               } else {
@@ -366,29 +367,38 @@ export default function HomeScreen({navigation}) {
               {fileOutcome.map((uri, index) => {
                 if (fileType[index] == 'PDF Document') {
                   return (
-                    <FileShow.PdfShow key={uri} onClose={() => delfile(uri)} />
+                    <FileShow.PdfShow
+                      key={uri}
+                      onClose={() => delfile(index)}
+                    />
                   );
                 } else if (fileType[index] == 'Word Document') {
                   return (
-                    <FileShow.WordShow key={uri} onClose={() => delfile(uri)} />
+                    <FileShow.WordShow
+                      key={uri}
+                      onClose={() => delfile(index)}
+                    />
                   );
                 } else if (fileType[index] == 'Excel Spreadsheet') {
                   return (
                     <FileShow.ExcelShow
                       key={uri}
-                      onClose={() => delfile(uri)}
+                      onClose={() => delfile(index)}
                     />
                   );
                 } else if (fileType[index] == 'PowerPoint Presentation') {
                   return (
-                    <FileShow.PptShow key={uri} onClose={() => delfile(uri)} />
+                    <FileShow.PptShow
+                      key={uri}
+                      onClose={() => delfile(index)}
+                    />
                   );
                 } else if (fileType[index] == 'Image') {
                   return (
                     <PicShow
                       key={uri}
                       imageUrl={uri}
-                      onClose={() => delfile(uri)}
+                      onClose={() => delfile(index)}
                     />
                   );
                 } else {

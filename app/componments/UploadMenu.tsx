@@ -5,6 +5,7 @@ import {
   Text,
   StyleSheet,
   View,
+  Image,
 } from 'react-native';
 import UploadImgButton from './UploadButton';
 
@@ -19,6 +20,12 @@ const ScrollableButtonSelector = function ({
     {id: '3', label: '微信'},
     {id: '4', label: '文件'},
     // ... 更多选项
+  ];
+  const optionIcon = [
+    require('../assets/icons/album.png'),
+    require('../assets/icons/camera.png'),
+    require('../assets/icons/wechat.png'),
+    require('../assets/icons/folder.png'),
   ];
 
   const handleSelect = (id: string) => {
@@ -38,13 +45,16 @@ const ScrollableButtonSelector = function ({
       horizontal
       showsHorizontalScrollIndicator={false}
       style={styles.scrollView}>
-      {options.map(option => (
+      {options.map((option, index) => (
         <TouchableOpacity
           key={option.id}
           style={styles.button}
           onPress={() => handleSelect(option.id)}>
           <Text style={styles.buttonText}>{option.label}</Text>
-          <Text style={[styles.buttonText, {color: 'grey'}]}>icon</Text>
+          <Image
+            source={optionIcon[index]}
+            style={{width: 25, height: 25, margin: 10}}
+          />
         </TouchableOpacity>
       ))}
     </ScrollView>
@@ -61,7 +71,7 @@ const styles = StyleSheet.create({
     margin: 5,
     paddingVertical: 8,
     paddingHorizontal: 16,
-    backgroundColor: '#444444',
+    backgroundColor: '#0a5c5c',
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
@@ -75,7 +85,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: 18,
     color: 'white',
   },
 });
