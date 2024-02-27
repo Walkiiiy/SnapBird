@@ -32,7 +32,12 @@ import {
   FileTypeContext,
 } from '../Context';
 
-import {ocrInterface, uploadFile, delFileInterface} from '../interfaces/main';
+import {
+  ocrInterface,
+  uploadFile,
+  delFileInterface,
+  tableInterface,
+} from '../interfaces/main';
 
 export default function HomeScreen({navigation}) {
   // 动态变量
@@ -144,15 +149,19 @@ export default function HomeScreen({navigation}) {
       setTitle1('快速开始');
     } else {
       setShowActivativeIndicator(true);
-      if (option == '文本扫描OCR') {
+      if (option == '通用文字识别') {
         const outcome = await ocrInterface();
         if (outcome == 'server returned a bad signal!') {
           console.log('server returned a bad signal!');
         } else {
-          for (let result in outcome) {
+          for (let i in outcome) {
             setTextBoxValue(outcome[0].texts.join('\n'));
             setShowTextBox(true);
           }
+        }
+      } else if (option == '通用表格识别') {
+        const res = tableInterface();
+        for (let i in res) {
         }
       } else {
         setFileOutcome(fileUpload);
@@ -254,6 +263,7 @@ export default function HomeScreen({navigation}) {
           DocumentPicker.types.pptx,
           DocumentPicker.types.xls,
           DocumentPicker.types.xlsx,
+          DocumentPicker.types.images,
         ],
         allowMultiSelection: true,
       });

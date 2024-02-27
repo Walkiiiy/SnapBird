@@ -1,5 +1,6 @@
 import axios from 'axios';
 const url = 'http://10.0.2.2:5000/';
+
 export async function ocrInterface() {
   const Url = url + 'recognize';
   try {
@@ -12,6 +13,19 @@ export async function ocrInterface() {
     }
   } catch (error) {
     console.log(error);
+  }
+}
+
+export async function tableInterface() {
+  console.log('table recognize');
+  const Url = url + 'tableRecognize';
+  try {
+    const response = await axios.get(Url);
+    return response.data.results;
+  } catch (error) {
+    // Handle errors here
+    console.error('Error fetching the Excel file: ', error);
+    throw error; // Rethrow or handle as needed
   }
 }
 
@@ -42,6 +56,7 @@ export const uploadFile = async (fileUri, fileName) => {
     console.log(error);
   }
 };
+
 export async function delFileInterface(index) {
   const Url = url + 'delFile?index=' + index;
   try {
@@ -51,6 +66,7 @@ export async function delFileInterface(index) {
     console.log(error);
   }
 }
+
 function getFileExtension(filePath) {
   // 按点分割字符串，然后取最后一个元素作为扩展名
   const parts = filePath.split('.');

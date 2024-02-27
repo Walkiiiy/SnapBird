@@ -12,8 +12,15 @@ from GPT.GPT import chat
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
 
-fileNames = []
+fileNames = os.listdir(picPath)+os.listdir(pdfPath) + \
+    os.listdir(pptPath)+os.listdir(excelPath)+os.listdir(wordPath)
+
 fileTypes = []
+for fileName in fileNames:
+    fileTypes.append(determine_file_type(fileName))
+
+print('current fileName:', fileNames)
+print('current fileType:', fileTypes)
 
 
 @app.route('/chat', methods=['GET'])
@@ -100,10 +107,45 @@ def recognize():
         try:
             common_ocr = CommonOcr(file_path)
             texts = common_ocr.recognize()
+            if texts:
+                results.append({
+                    'file_name': filename,
+                    'texts': texts
+                })
+            else:
+                print('something went wrong with main/recognize.')
+        except Exception as e:
+            print(f"Error processing file {filename}: {e}")
             results.append({
                 'file_name': filename,
-                'texts': texts
+                'error': str(e)
             })
+    return jsonify({
+        'message': 'Files processed successfully',
+        'results': results
+    })
+
+
+@app.route('/tableRecognize', methods=['GET'])
+def table():
+    print(1313)
+    results = []
+    try:
+        files = os.listdir(picPath)  # 列出目录下所有文件
+    except Exception as e:
+        return jsonify({'message': 'Error listing input directory', 'error': str(e)})
+    for i, filename in enumerate(files):
+        file_path = os.path.join(picPath, filename)
+        try:
+            common_ocr = CommonOcr(file_path)
+            excel = common_ocr.tableRecognize()
+            if excel:
+                results.append({
+                    'file_name': filename,
+                    'excel': excel
+                })
+            else:
+                print('something went wrong with all/tableRecognize.')
         except Exception as e:
             print(f"Error processing file {filename}: {e}")
             results.append({

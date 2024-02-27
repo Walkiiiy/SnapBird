@@ -12,10 +12,10 @@ type ButtonOption = {
   label: string;
 };
 const options = [
-  {id: '1', label: '文本扫描OCR'},
-  {id: '2', label: '证件照片制作'},
-  {id: '3', label: '文件格式转换'},
-  {id: '4', label: '水印'},
+  {id: '1', label: '通用文字识别'},
+  {id: '2', label: '通用表格识别'},
+  {id: '3', label: '图像切边增强'},
+  {id: '4', label: '票据识别'},
   // ... 更多选项
 ];
 
