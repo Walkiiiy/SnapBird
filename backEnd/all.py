@@ -1,5 +1,6 @@
 import requests
 import json
+from apiKey import get_app_id, get_secret_code
 
 
 def get_file_content(filePath):
@@ -11,13 +12,11 @@ class CommonOcr(object):
     def __init__(self, img_path):
         # 请登录后前往 “工作台-账号设置-开发者信息” 查看 x-ti-app-id
         # 示例代码中 x-ti-app-id 非真实数据
-        # self._app_id = '2b28dd12a8df35c6e011652c3d5ae34c'
-        self._app_id = 'c1535adff7865206f024f1cacf0e2276'
+        self._app_id = get_app_id()
 
         # 请登录后前往 “工作台-账号设置-开发者信息” 查看 x-ti-secret-code
         # 示例代码中 x-ti-secret-code 非真实数据
-        # self._secret_code = 'af77b74350459fae48e60f1ca73c1801'
-        self._secret_code = '7f397872e8511a670592ba1a87ac3de7'
+        self._secret_code = get_secret_code()
 
         self._img_path = img_path
 
