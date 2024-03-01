@@ -126,9 +126,8 @@ def recognize():
     })
 
 
-@app.route('/tableRecognize', methods=['GET'])
+@app.route('/tableRecognize', methods=['GET'])  # 表格识别 image->excel
 def table():
-    print(1313)
     results = []
     try:
         files = os.listdir(picPath)  # 列出目录下所有文件
@@ -142,7 +141,7 @@ def table():
             if excel:
                 results.append({
                     'file_name': filename,
-                    'excel': excel
+                    'res': excel
                 })
             else:
                 print('something went wrong with all/tableRecognize.')
@@ -158,42 +157,62 @@ def table():
     })
 
 
-'''
-去水印
-return 图片的base64编码
-'''
-
-
-@app.route('/watermark_remove', methods=['POST'])
-def watermark_remove():
-    uploaded_files = request.files.getlist('files')
-    if not uploaded_files:
-        return jsonify({'message': 'No files were uploaded'})
-
+@app.route('/cropEnhance', methods=['GET'])  # 图像切边增强 image->image
+def cropEnhance():
     results = []
-
-    for i, uploaded_file in enumerate(uploaded_files):
+    try:
+        files = os.listdir(picPath)  # 列出目录下所有文件
+    except Exception as e:
+        return jsonify({'message': 'Error listing input directory', 'error': str(e)})
+    for i, filename in enumerate(files):
+        file_path = os.path.join(picPath, filename)
         try:
-            # 使用时间戳创建唯一的文件名
-            timestamp = str(int(time.time()))
-            file_path = os.path.join(inputPath, f'input_{timestamp}_{i}.png')
-            uploaded_file.save(file_path)
-
             common_ocr = CommonOcr(file_path)
-            texts = common_ocr.watermark_remove()
-
-            results.append({
-                'file_name': uploaded_file.filename,
-                'image_base64': texts
-            })
+            res = common_ocr.crop_enhance_image()
+            if res:
+                results.append({
+                    'file_name': filename,
+                    'res': res
+                })
+            else:
+                print('something went wrong with all/crop_enhance_image.')
         except Exception as e:
-            # 记录错误并返回友好的错误信息
-            print(f"Error processing file {uploaded_file.filename}: {e}")
+            print(f"Error processing file {filename}: {e}")
             results.append({
-                'file_name': uploaded_file.filename,
+                'file_name': filename,
                 'error': str(e)
             })
+    return jsonify({
+        'message': 'Files processed successfully',
+        'results': results
+    })
 
+
+@app.route('/waterMarkRemove', methods=['GET'])  # 图像去水印 image->image
+def waterMarkRemove():
+    results = []
+    try:
+        files = os.listdir(picPath)  # 列出目录下所有文件
+    except Exception as e:
+        return jsonify({'message': 'Error listing input directory', 'error': str(e)})
+    for i, filename in enumerate(files):
+        file_path = os.path.join(picPath, filename)
+        try:
+            common_ocr = CommonOcr(file_path)
+            res = common_ocr.watermark_remove()
+            if res:
+                results.append({
+                    'file_name': filename,
+                    'res': res
+                })
+            else:
+                print('something went wrong with all/waterMarkRemove.')
+        except Exception as e:
+            print(f"Error processing file {filename}: {e}")
+            results.append({
+                'file_name': filename,
+                'error': str(e)
+            })
     return jsonify({
         'message': 'Files processed successfully',
         'results': results

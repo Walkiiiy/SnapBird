@@ -1,6 +1,7 @@
 import requests
 import json
 from apiKey import get_app_id, get_secret_code
+import base64
 
 
 def get_file_content(filePath):
@@ -48,13 +49,27 @@ class CommonOcr(object):
             head['x-ti-app-id'] = self._app_id
             head['x-ti-secret-code'] = self._secret_code
             result = requests.post(url, data=image, headers=head)
-            print(1212)
             result = (json.loads(result.text).get(
                 'result', {}).get('excel', None))
             return result
         except Exception as e:
             print(e)
             return 0
+
+    def crop_enhance_image(self):
+        # 图片切边增强
+        url = 'https://api.textin.com/ai/service/v1/crop_enhance_image'
+        head = {}
+        try:
+            image = get_file_content(self._img_path)
+            head['x-ti-app-id'] = self._app_id
+            head['x-ti-secret-code'] = self._secret_code
+            result = requests.post(url, data=image, headers=head)
+            result = (json.loads(result.text).get(
+                'result', {}).get('image_list', None))[0].get('image', None)
+            return result
+        except Exception as e:
+            return e
 
     def watermark_remove(self):
         # 图像水印去除

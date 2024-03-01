@@ -12,10 +12,10 @@ type ButtonOption = {
   label: string;
 };
 const options = [
-  {id: '1', label: '通用文字识别'},
-  {id: '2', label: '通用表格识别'},
-  {id: '3', label: '图像切边增强'},
-  {id: '4', label: '票据识别'},
+  {id: '1', label: '通用文字识别', intro: '图像->文本'},
+  {id: '2', label: '图像切边增强', intro: '图像->图像'},
+  {id: '3', label: '通用表格识别', intro: '图像->excel'},
+  {id: '4', label: '图像水印去除', intro: '图像->图像'},
   // ... 更多选项
 ];
 
@@ -31,7 +31,9 @@ export default function ScrollableButtonSelector({handleSelect}) {
           style={styles.button}
           onPress={() => handleSelect(option.label)}>
           <Text style={styles.buttonText}>{option.label}</Text>
-          <Text style={[styles.buttonText, {color: 'grey'}]}>icon</Text>
+          <Text style={[styles.buttonText, {color: 'grey'}]}>
+            {option.intro}
+          </Text>
         </TouchableOpacity>
       ))}
     </ScrollView>
@@ -64,5 +66,6 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     color: 'white',
+    margin: 2,
   },
 });

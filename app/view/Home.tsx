@@ -14,6 +14,7 @@ import {launchImageLibrary, launchCamera} from 'react-native-image-picker';
 import DocumentPicker from 'react-native-document-picker';
 import {useFocusEffect} from '@react-navigation/native';
 import axios from 'axios';
+import RNFS from 'react-native-fs';
 
 import ShortCut from '../componments/ShortCut';
 import UploadButton from '../componments/UploadButton';
@@ -37,6 +38,7 @@ import {
   uploadFile,
   delFileInterface,
   tableInterface,
+  cropEnhanceInterface,
 } from '../interfaces/main';
 
 export default function HomeScreen({navigation}) {
@@ -143,6 +145,7 @@ export default function HomeScreen({navigation}) {
   //处理快速开始选择
   async function quickStart(option: string) {
     console.log(`Selected option: ${option}`);
+    setShowTextBox(false);
     if (fileUpload.length == 0) {
       setTitle1('请先上传图片或文件！！');
       await wait(1500);
@@ -163,6 +166,9 @@ export default function HomeScreen({navigation}) {
         const res = tableInterface();
         for (let i in res) {
         }
+      } else if (option == '图像切边增强') {
+        const res = await cropEnhanceInterface();
+        setFileOutcome(fileOutcome => fileOutcome.concat(res));
       } else {
         setFileOutcome(fileUpload);
       }
@@ -184,19 +190,18 @@ export default function HomeScreen({navigation}) {
   }
   //从图片uri列表和outcome列表删除元素
   function delfile(index) {
-    // 删除指定索引的文件上传项
     setFileUpload(currentFileUploads => {
       const tempArray = [...currentFileUploads];
       if (index >= 0 && index < tempArray.length) {
         tempArray.splice(index, 1);
         if (tempArray.length === 0) {
           setPicVisible(false);
+          setTextBoxValue(false);
         }
       }
       return tempArray;
     });
 
-    // 删除指定索引的文件结果项
     setFileOutcome(currentFileOutcomes => {
       const tempArray = [...currentFileOutcomes];
       if (index >= 0 && index < tempArray.length) {
@@ -205,7 +210,6 @@ export default function HomeScreen({navigation}) {
       return tempArray;
     });
 
-    // 删除指定索引的文件类型项
     setFileType(currentFileTypes => {
       const tempArray = [...currentFileTypes];
       if (index >= 0 && index < tempArray.length) {
@@ -215,6 +219,17 @@ export default function HomeScreen({navigation}) {
     });
     delFileInterface(index); // 假设这是向服务器发送删除请求的函数
   }
+  //仅从outcome列表删除元素
+  function deloutcomefile(index) {
+    setFileOutcome(currentFileOutcomes => {
+      const tempArray = [...currentFileOutcomes];
+      if (index >= 0 && index < tempArray.length) {
+        tempArray.splice(index, 1);
+      }
+      return tempArray;
+    });
+  }
+
   function uploadImg() {
     const options = {
       noData: true,
@@ -359,7 +374,7 @@ export default function HomeScreen({navigation}) {
                   />
                 );
               } else {
-                console.log('known type of file!');
+                console.log('unknown type of file!');
               }
             })}
           </ScrollView>
@@ -374,42 +389,50 @@ export default function HomeScreen({navigation}) {
             />
           ) : (
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {fileOutcome.map((uri, index) => {
-                if (fileType[index] == 'PDF Document') {
+              {fileOutcome.map((outcome, index) => {
+                if (getFileType(outcome.file_name) == 'PDF Document') {
                   return (
                     <FileShow.PdfShow
-                      key={uri}
-                      onClose={() => delfile(index)}
+                      key={outcome.file_name}
+                      onClose={() => deloutcomefile(index)}
                     />
                   );
-                } else if (fileType[index] == 'Word Document') {
+                } else if (getFileType(outcome.file_name) == 'Word Document') {
                   return (
                     <FileShow.WordShow
-                      key={uri}
-                      onClose={() => delfile(index)}
+                      key={outcome.file_name}
+                      onClose={() => deloutcomefile(index)}
                     />
                   );
-                } else if (fileType[index] == 'Excel Spreadsheet') {
+                } else if (
+                  getFileType(outcome.file_name) == 'Excel Spreadsheet'
+                ) {
                   return (
                     <FileShow.ExcelShow
-                      key={uri}
-                      onClose={() => delfile(index)}
+                      key={outcome.file_name}
+                      onClose={() => deloutcomefile(index)}
                     />
                   );
-                } else if (fileType[index] == 'PowerPoint Presentation') {
+                } else if (
+                  getFileType(outcome.file_name) == 'PowerPoint Presentation'
+                ) {
                   return (
                     <FileShow.PptShow
-                      key={uri}
-                      onClose={() => delfile(index)}
+                      key={outcome.file_name}
+                      onClose={() => deloutcomefile(index)}
                     />
                   );
-                } else if (fileType[index] == 'Image') {
+                } else if (getFileType(outcome.file_name) == 'Image') {
                   return (
                     <PicShow
-                      key={uri}
-                      imageUrl={uri}
-                      onClose={() => delfile(index)}
+                      key={outcome.file_name}
+                      imageUrl={`data:image/jpeg;base64,${outcome.res}`}
+                      onClose={() => deloutcomefile(index)}
                     />
+                    // <Image
+                    //   source={{uri: `data:image/jpeg;base64,${outcome.res}`}}
+                    //   style={styles.image}
+                    // />
                   );
                 } else {
                   console.log('known type of file!');
