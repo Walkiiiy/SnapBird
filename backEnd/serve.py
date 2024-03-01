@@ -4,6 +4,7 @@ from all import CommonOcr
 import time
 import os
 import json
+import random
 
 from setpath import *
 from utils import determine_file_type
@@ -109,7 +110,7 @@ def recognize():
             texts = common_ocr.recognize()
             if texts:
                 results.append({
-                    'file_name': filename,
+                    'file_name': str(random.randint(100, 999))+filename,
                     'texts': texts
                 })
             else:
@@ -140,7 +141,7 @@ def table():
             excel = common_ocr.tableRecognize()
             if excel:
                 results.append({
-                    'file_name': filename,
+                    'file_name': str(random.randint(100, 999))+filename+'.xls',
                     'res': excel
                 })
             else:
@@ -171,7 +172,7 @@ def cropEnhance():
             res = common_ocr.crop_enhance_image()
             if res:
                 results.append({
-                    'file_name': filename,
+                    'file_name': str(random.randint(100, 999))+filename,
                     'res': res
                 })
             else:

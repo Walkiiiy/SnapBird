@@ -23,6 +23,15 @@ export async function tableInterface() {
   const Url = url + 'tableRecognize';
   try {
     const response = await axios.get(Url);
+    //存储文件到内部
+    // for (let i in response.data.results) {
+    //   paths.push(
+    //     saveFile(
+    //       response.data.results[i].file_name,
+    //       response.data.results[i].res,
+    //     ),
+    //   );
+    // }
     return response.data.results;
   } catch (error) {
     // Handle errors here

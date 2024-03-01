@@ -163,14 +163,13 @@ export default function HomeScreen({navigation}) {
           }
         }
       } else if (option == '通用表格识别') {
-        const res = tableInterface();
-        for (let i in res) {
-        }
+        const res = await tableInterface();
+        setFileOutcome(fileOutcome => fileOutcome.concat(res));
       } else if (option == '图像切边增强') {
         const res = await cropEnhanceInterface();
         setFileOutcome(fileOutcome => fileOutcome.concat(res));
       } else {
-        setFileOutcome(fileUpload);
+        console.log('unknown function');
       }
       setShowActivativeIndicator(false);
     }
@@ -390,6 +389,7 @@ export default function HomeScreen({navigation}) {
           ) : (
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {fileOutcome.map((outcome, index) => {
+                console.log(outcome.file_name);
                 if (getFileType(outcome.file_name) == 'PDF Document') {
                   return (
                     <FileShow.PdfShow
