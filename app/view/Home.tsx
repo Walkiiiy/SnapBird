@@ -39,6 +39,7 @@ import {
   delFileInterface,
   tableInterface,
   cropEnhanceInterface,
+  waterMarkRemove,
 } from '../interfaces/main';
 
 export default function HomeScreen({navigation}) {
@@ -167,6 +168,9 @@ export default function HomeScreen({navigation}) {
         setFileOutcome(fileOutcome => fileOutcome.concat(res));
       } else if (option == '图像切边增强') {
         const res = await cropEnhanceInterface();
+        setFileOutcome(fileOutcome => fileOutcome.concat(res));
+      } else if (option == '图像水印去除') {
+        const res = await waterMarkRemove();
         setFileOutcome(fileOutcome => fileOutcome.concat(res));
       } else {
         console.log('unknown function');

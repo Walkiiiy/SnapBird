@@ -81,10 +81,9 @@ class CommonOcr(object):
             head['x-ti-secret-code'] = self._secret_code
             result = requests.post(url, data=image, headers=head)
             # 解析JSON数据
-            data = json.loads(result.text)
-            # 提取result中的text内容
-            texts = data['result']['image']
-            return texts
+            result = (json.loads(result.text).get(
+                'result', {}).get('image', None))
+            return result
         except Exception as e:
             return e
 

@@ -127,7 +127,7 @@ def recognize():
     })
 
 
-@app.route('/tableRecognize', methods=['GET'])  # 表格识别 image->excel
+@app.route('/tableRecognize', methods=['GET'])  # 表格识别image->excel
 def table():
     results = []
     try:
@@ -158,7 +158,7 @@ def table():
     })
 
 
-@app.route('/cropEnhance', methods=['GET'])  # 图像切边增强 image->image
+@app.route('/cropEnhance', methods=['GET'])  # 图像切边增强image->image
 def cropEnhance():
     results = []
     try:
@@ -211,7 +211,7 @@ def waterMarkRemove():
         except Exception as e:
             print(f"Error processing file {filename}: {e}")
             results.append({
-                'file_name': filename,
+                'file_name': str(random.randint(100, 999))+filename,
                 'error': str(e)
             })
     return jsonify({
