@@ -69,7 +69,7 @@ class CommonOcr(object):
                 'result', {}).get('image_list', None))[0].get('image', None)
             return result
         except Exception as e:
-            return e
+            return 0
 
     def watermark_remove(self):
         # 图像水印去除
@@ -85,20 +85,8 @@ class CommonOcr(object):
                 'result', {}).get('image', None))
             return result
         except Exception as e:
-            return e
-
-    def id_card(self):
-        # 身份证识别
-        url = 'https://api.textin.com/robot/v1.0/api/id_card'
-        head = {}
-        try:
-            image = get_file_content(self._img_path)
-            head['x-ti-app-id'] = self._app_id
-            head['x-ti-secret-code'] = self._secret_code
-            result = requests.post(url, data=image, headers=head)
-            return result.text
-        except Exception as e:
-            return e
+            print(e)
+            return 0
 
     def pdf_to_word(self):
         # PDF转Word
@@ -111,7 +99,8 @@ class CommonOcr(object):
             result = requests.post(url, data=image, headers=head)
             return result.text
         except Exception as e:
-            return e
+            print(e)
+            return 0
 
     def pdf_to_excel(self):
         # PDF转Excel
@@ -124,7 +113,8 @@ class CommonOcr(object):
             result = requests.post(url, data=image, headers=head)
             return result.text
         except Exception as e:
-            return e
+            print(e)
+            return 0
 
     def pdf_to_ppt(self):
         # PDF转PPT
@@ -137,7 +127,8 @@ class CommonOcr(object):
             result = requests.post(url, data=image, headers=head)
             return result.text
         except Exception as e:
-            return e
+            print(e)
+            return 0
 
     def pdf_to_img(self):
         # PDF转图片
@@ -150,7 +141,8 @@ class CommonOcr(object):
             result = requests.post(url, data=image, headers=head)
             return result.text
         except Exception as e:
-            return e
+            print(e)
+            return 0
 
     def word_to_pdf(self):
         # Word转PDF
@@ -163,7 +155,8 @@ class CommonOcr(object):
             result = requests.post(url, data=image, headers=head)
             return result.text
         except Exception as e:
-            return e
+            print(e)
+            return 0
 
     def excel_to_pdf(self):
         # Excel转PDF
@@ -176,7 +169,8 @@ class CommonOcr(object):
             result = requests.post(url, data=image, headers=head)
             return result.text
         except Exception as e:
-            return e
+            print(e)
+            return 0
 
     def img_to_pdf(self):
         # 图片转PDF
@@ -189,7 +183,8 @@ class CommonOcr(object):
             result = requests.post(url, data=image, headers=head)
             return result.text
         except Exception as e:
-            return e
+            print(e)
+            return 0
 
     def word_to_img(self):
         # Word转图片
@@ -200,15 +195,9 @@ class CommonOcr(object):
             head['x-ti-app-id'] = self._app_id
             head['x-ti-secret-code'] = self._secret_code
             result = requests.post(url, data=image, headers=head)
-            return result.text
+            result = (json.loads(result.text).get(
+                'result', {}))
+            return result
         except Exception as e:
-            return e
-
-
-if __name__ == "__main__":
-    response = CommonOcr(r'back/pics/input.png')
-    # print(response.recognize())
-
-    # for text in response.recognize():
-    #     print(text)
-    print(response.watermark_remove())
+            print(e)
+            return 0

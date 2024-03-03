@@ -84,6 +84,28 @@ export async function waterMarkRemove() {
     throw error; // Rethrow or handle as needed
   }
 }
+export async function wordToImage() {
+  console.log('main:wordToImage');
+  const Url = url + 'word_to_img';
+  try {
+    const response = await axios.get(Url);
+    //存储文件到内部
+    // for (let i in response.data.results) {
+    //   paths.push(
+    //     saveFile(
+    //       response.data.results[i].file_name,
+    //       response.data.results[i].res,
+    //     ),
+    //   );
+    // }
+    return response.data.results;
+  } catch (error) {
+    // Handle errors here
+    console.error('Error fetching the pic file: ', error);
+    throw error; // Rethrow or handle as needed
+  }
+}
+
 export const uploadFile = async (fileUri, fileName) => {
   // 创建 FormData 对象
   const formData = new FormData();

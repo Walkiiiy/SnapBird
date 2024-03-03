@@ -5,6 +5,9 @@ import time
 import os
 import json
 import random
+import zipfile
+import base64
+import io
 
 from setpath import *
 from utils import determine_file_type
@@ -22,6 +25,18 @@ for fileName in fileNames:
 
 print('current fileName:', fileNames)
 print('current fileType:', fileTypes)
+
+
+def get_files_base64_andRemove(directory):
+    base64_files = []
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            file_path = os.path.join(root, file)
+            with open(file_path, 'rb') as file_to_encode:
+                file_content = file_to_encode.read()
+                base64_content = base64.b64encode(file_content).decode('utf-8')
+                base64_files.append((file, base64_content))
+    return base64_files
 
 
 @app.route('/chat', methods=['GET'])
@@ -94,7 +109,7 @@ def del_file():
     return jsonify({'message': 'File has been removed successfully'})
 
 
-@app.route('/recognize', methods=['GET'])  # 批量文字识别
+@app.route('/recognize', methods=['GET'])  # 批量文字识别image->文本
 def recognize():
     try:
         files = os.listdir(picPath)  # 列出目录下所有文件
@@ -189,7 +204,7 @@ def cropEnhance():
     })
 
 
-@app.route('/waterMarkRemove', methods=['GET'])  # 图像去水印 image->image
+@app.route('/waterMarkRemove', methods=['GET'])  # 去水印image->image
 def waterMarkRemove():
     results = []
     try:
@@ -203,7 +218,7 @@ def waterMarkRemove():
             res = common_ocr.watermark_remove()
             if res:
                 results.append({
-                    'file_name': filename,
+                    'file_name': str(random.randint(100, 999))+filename,
                     'res': res
                 })
             else:
@@ -220,130 +235,39 @@ def waterMarkRemove():
     })
 
 
-'''
-身份证识别
-'''
-
-
-@app.route('/id_card', methods=['POST'])
-def id_card():
-    uploaded_files = request.files.getlist('files')
-    if not uploaded_files:
-        return jsonify({'message': 'No files were uploaded'})
-
-    results = []
-
-    for i, uploaded_file in enumerate(uploaded_files):
-        try:
-            # 使用时间戳创建唯一的文件名
-            timestamp = str(int(time.time()))
-            file_path = os.path.join(inputPath, f'input_{timestamp}_{i}.png')
-            uploaded_file.save(file_path)
-
-            common_ocr = CommonOcr(file_path)
-
-            # 测试，后期删掉
-            return send_from_directory(inputPath, f'input_{timestamp}_{i}.png')
-            texts = common_ocr.id_card()
-
-            results.append({
-                'file_name': uploaded_file.filename,
-                'image_base64': texts
-            })
-        except Exception as e:
-            # 记录错误并返回友好的错误信息
-            print(f"Error processing file {uploaded_file.filename}: {e}")
-            results.append({
-                'file_name': uploaded_file.filename,
-                'error': str(e)
-            })
-
-    return jsonify({
-        'message': 'Files processed successfully',
-        'results': results
-    })
-
-
-'''
-pdf转img
-'''
-
-
-@app.route('/pdf_to_img', methods=['POST'])
-def pdf_to_img():
-    uploaded_files = request.files.getlist('files')
-    if not uploaded_files:
-        return jsonify({'message': 'No files were uploaded'})
-
-    results = []
-
-    for i, uploaded_file in enumerate(uploaded_files):
-        try:
-            # 使用时间戳创建唯一的文件名
-            timestamp = str(int(time.time()))
-            file_path = os.path.join(inputPath, f'input_{timestamp}_{i}.png')
-            uploaded_file.save(file_path)
-
-            common_ocr = CommonOcr(file_path)
-            # 测试，后期删掉
-            return send_from_directory(inputPath, f'input_{timestamp}_{i}.png')
-            texts = common_ocr.pdf_to_img()
-
-            results.append({
-                'file_name': uploaded_file.filename,
-                'image_base64': texts
-            })
-        except Exception as e:
-            # 记录错误并返回友好的错误信息
-            print(f"Error processing file {uploaded_file.filename}: {e}")
-            results.append({
-                'file_name': uploaded_file.filename,
-                'error': str(e)
-            })
-
-    return jsonify({
-        'message': 'Files processed successfully',
-        'results': results
-    })
-
-
-'''
-word转img
-'''
-
-
-@app.route('/word_to_img', methods=['POST'])
+@app.route('/word_to_img', methods=['GET'])  # word转image
 def word_to_img():
-    uploaded_files = request.files.getlist('files')
-    if not uploaded_files:
-        return jsonify({'message': 'No files were uploaded'})
-
     results = []
-
-    for i, uploaded_file in enumerate(uploaded_files):
+    try:
+        files = os.listdir(wordPath)  # 列出目录下所有文件
+    except Exception as e:
+        return jsonify({'message': 'Error listing input directory', 'error': str(e)})
+    for i, filename in enumerate(files):
+        file_path = os.path.join(wordPath, filename)
         try:
-            # 使用时间戳创建唯一的文件名
-            timestamp = str(int(time.time()))
-            file_path = os.path.join(inputPath, f'input_{timestamp}_{i}.png')
-            uploaded_file.save(file_path)
-
             common_ocr = CommonOcr(file_path)
-            # 测试，后期删掉
-            return send_from_directory(inputPath, f'input_{timestamp}_{i}.png')
-            texts = common_ocr.word_to_img()
-
-            results.append({
-                'file_name': uploaded_file.filename,
-                'image_base64': texts
-            })
+            res = common_ocr.word_to_img()
+            if res:
+                zip_bytes = base64.b64decode(res)
+                # 使用io.BytesIO创建一个类文件对象
+                zip_stream = io.BytesIO(zip_bytes)
+                # 使用zipfile读取类文件对象
+                with zipfile.ZipFile(zip_stream, 'r') as zip_ref:
+                    zip_ref.extractall(tempPath)
+                base64_files = get_files_base64_andRemove(tempPath)
+                for item in base64_files:
+                    results.append({
+                        'file_name': str(random.randint(100, 999))+item[0]+'.jpg',
+                        'res': item[1]
+                    })
+            else:
+                print('something went wrong with all/word_to_img.')
         except Exception as e:
-            # 记录错误并返回友好的错误信息
-            print(f"Error processing file {uploaded_file.filename}: {e}")
+            print(f"Error processing file {filename}: {e}")
             results.append({
-                'file_name': uploaded_file.filename,
+                'file_name': str(random.randint(100, 999))+filename,
                 'error': str(e)
             })
-
     return jsonify({
         'message': 'Files processed successfully',
         'results': results

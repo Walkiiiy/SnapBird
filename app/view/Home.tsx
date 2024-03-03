@@ -40,6 +40,7 @@ import {
   tableInterface,
   cropEnhanceInterface,
   waterMarkRemove,
+  wordToImage,
 } from '../interfaces/main';
 
 export default function HomeScreen({navigation}) {
@@ -171,6 +172,9 @@ export default function HomeScreen({navigation}) {
         setFileOutcome(fileOutcome => fileOutcome.concat(res));
       } else if (option == '图像水印去除') {
         const res = await waterMarkRemove();
+        setFileOutcome(fileOutcome => fileOutcome.concat(res));
+      } else if (option == 'word转图片') {
+        const res = await wordToImage();
         setFileOutcome(fileOutcome => fileOutcome.concat(res));
       } else {
         console.log('unknown function');

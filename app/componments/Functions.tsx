@@ -16,6 +16,16 @@ const options = [
   {id: '2', label: '图像切边增强', intro: '图像->图像'},
   {id: '3', label: '通用表格识别', intro: '图像->excel'},
   {id: '4', label: '图像水印去除', intro: '图像->图像'},
+  {id: '5', label: 'word转图片', intro: 'word->图像'},
+  {id: '6', label: '图片转pdf', intro: '图像->pdf'},
+  {id: '7', label: 'excel转pdf', intro: 'excel->pdf'},
+  {id: '8', label: 'word转pdf', intro: 'word->pdf'},
+  {id: '9', label: 'pdf转图片', intro: 'pdf->图像'},
+  {id: '10', label: 'pdf转ppt', intro: 'pdf->ppt'},
+  {id: '11', label: 'pdf转excel', intro: 'pdf->excel'},
+  {id: '12', label: 'pdf转word', intro: 'pdf->word'},
+  {id: '13', label: '图片转word', intro: '图像->word'},
+
   // ... 更多选项
 ];
 
