@@ -410,5 +410,129 @@ def pdf_to_image():
     })
 
 
+@app.route('/pdf_to_ppt', methods=['GET'])  # pdf转ppt
+def pdf_to_ppt():
+    results = []
+    try:
+        files = os.listdir(pdfPath)  # 列出目录下所有文件
+    except Exception as e:
+        return jsonify({'message': 'Error listing input directory', 'error': str(e)})
+    for i, filename in enumerate(files):
+        file_path = os.path.join(pdfPath, filename)
+        try:
+            common_ocr = CommonOcr(file_path)
+            res = common_ocr.pdf_to_ppt()
+            if res:
+                results.append({
+                    'file_name': str(random.randint(100, 999))+filename+'.ppt',
+                    'res': res,
+                })
+            else:
+                print('something went wrong with all/pdf_to_ppt.')
+        except Exception as e:
+            print(f"Error processing file {filename}: {e}")
+            results.append({
+                'file_name': str(random.randint(100, 999))+filename,
+                'error': str(e)
+            })
+    return jsonify({
+        'message': 'Files processed successfully',
+        'results': results
+    })
+
+
+@app.route('/pdf_to_excel', methods=['GET'])  # pdf转excel
+def pdf_to_excel():
+    results = []
+    try:
+        files = os.listdir(pdfPath)  # 列出目录下所有文件
+    except Exception as e:
+        return jsonify({'message': 'Error listing input directory', 'error': str(e)})
+    for i, filename in enumerate(files):
+        file_path = os.path.join(pdfPath, filename)
+        try:
+            common_ocr = CommonOcr(file_path)
+            res = common_ocr.pdf_to_excel()
+            if res:
+                results.append({
+                    'file_name': str(random.randint(100, 999))+filename+'.xls',
+                    'res': res,
+                })
+            else:
+                print('something went wrong with all/pdf_to_excel.')
+        except Exception as e:
+            print(f"Error processing file {filename}: {e}")
+            results.append({
+                'file_name': str(random.randint(100, 999))+filename,
+                'error': str(e)
+            })
+    return jsonify({
+        'message': 'Files processed successfully',
+        'results': results
+    })
+
+
+@app.route('/pdf_to_word', methods=['GET'])  # pdf转word
+def pdf_to_word():
+    results = []
+    try:
+        files = os.listdir(pdfPath)  # 列出目录下所有文件
+    except Exception as e:
+        return jsonify({'message': 'Error listing input directory', 'error': str(e)})
+    for i, filename in enumerate(files):
+        file_path = os.path.join(pdfPath, filename)
+        try:
+            common_ocr = CommonOcr(file_path)
+            res = common_ocr.pdf_to_word()
+            if res:
+                results.append({
+                    'file_name': str(random.randint(100, 999))+filename+'.doc',
+                    'res': res,
+                })
+            else:
+                print('something went wrong with all/pdf_to_word.')
+        except Exception as e:
+            print(f"Error processing file {filename}: {e}")
+            results.append({
+                'file_name': str(random.randint(100, 999))+filename,
+                'error': str(e)
+            })
+    return jsonify({
+        'message': 'Files processed successfully',
+        'results': results
+    })
+
+
+@app.route('/img_to_word', methods=['GET'])  # 图片转word
+def img_to_word():
+    results = []
+    try:
+        files = os.listdir(picPath)  # 列出目录下所有文件
+    except Exception as e:
+        return jsonify({'message': 'Error listing input directory', 'error': str(e)})
+    for i, filename in enumerate(files):
+        file_path = os.path.join(picPath, filename)
+        try:
+            common_ocr = CommonOcr(file_path)
+            res = common_ocr.img_to_word()
+            if res:
+                results.append({
+                    'file_name': str(random.randint(100, 999))+filename+'.doc',
+                    'res': res,
+                })
+            else:
+                print('something went wrong with all/img_to_word.')
+        except Exception as e:
+            print(f"Error processing file {filename}: {e}")
+            results.append({
+                'file_name': str(random.randint(100, 999))+filename,
+                'error': str(e)
+            })
+    return jsonify({
+        'message': 'Files processed successfully',
+        'results': results
+    })
+
+
 if __name__ == '__main__':
     app.run(port=5000, debug=True)

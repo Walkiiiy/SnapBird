@@ -190,6 +190,93 @@ export async function pdfToImg() {
     throw error; // Rethrow or handle as needed
   }
 }
+
+export async function pdfToPpt() {
+  console.log('main:pdfToPpt');
+  const Url = url + 'pdf_to_ppt';
+  try {
+    const response = await axios.get(Url);
+    //存储文件到内部
+    // for (let i in response.data.results) {
+    //   paths.push(
+    //     saveFile(
+    //       response.data.results[i].file_name,
+    //       response.data.results[i].res,
+    //     ),
+    //   );
+    // }
+    return response.data.results;
+  } catch (error) {
+    // Handle errors here
+    console.error('Error fetching the pdf file: ', error);
+    throw error; // Rethrow or handle as needed
+  }
+}
+export async function pdfToExcel() {
+  console.log('main:pdfToExcel');
+  const Url = url + 'pdf_to_excel';
+  try {
+    const response = await axios.get(Url);
+    //存储文件到内部
+    // for (let i in response.data.results) {
+    //   paths.push(
+    //     saveFile(
+    //       response.data.results[i].file_name,
+    //       response.data.results[i].res,
+    //     ),
+    //   );
+    // }
+    return response.data.results;
+  } catch (error) {
+    // Handle errors here
+    console.error('Error fetching the pdf file: ', error);
+    throw error; // Rethrow or handle as needed
+  }
+}
+export async function pdfToWord() {
+  console.log('main:pdfToWord');
+  const Url = url + 'pdf_to_word';
+  try {
+    const response = await axios.get(Url);
+    //存储文件到内部
+    // for (let i in response.data.results) {
+    //   paths.push(
+    //     saveFile(
+    //       response.data.results[i].file_name,
+    //       response.data.results[i].res,
+    //     ),
+    //   );
+    // }
+    return response.data.results;
+  } catch (error) {
+    // Handle errors here
+    console.error('Error fetching the pdf file: ', error);
+    throw error; // Rethrow or handle as needed
+  }
+}
+
+export async function imgToWord() {
+  console.log('main:imgToWord');
+  const Url = url + 'img_to_word';
+  try {
+    const response = await axios.get(Url);
+    //存储文件到内部
+    // for (let i in response.data.results) {
+    //   paths.push(
+    //     saveFile(
+    //       response.data.results[i].file_name,
+    //       response.data.results[i].res,
+    //     ),
+    //   );
+    // }
+    return response.data.results;
+  } catch (error) {
+    // Handle errors here
+    console.error('Error fetching the img file: ', error);
+    throw error; // Rethrow or handle as needed
+  }
+}
+
 export const uploadFile = async (fileUri, fileName) => {
   // 创建 FormData 对象
   const formData = new FormData();

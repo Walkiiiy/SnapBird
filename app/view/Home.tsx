@@ -45,6 +45,10 @@ import {
   excelToPdf,
   wordToPdf,
   pdfToImg,
+  pdfToPpt,
+  pdfToExcel,
+  pdfToWord,
+  imgToWord,
 } from '../interfaces/main';
 
 export default function HomeScreen({navigation}) {
@@ -191,6 +195,18 @@ export default function HomeScreen({navigation}) {
         setFileOutcome(fileOutcome => fileOutcome.concat(res));
       } else if (option == 'pdf转图片') {
         const res = await pdfToImg();
+        setFileOutcome(fileOutcome => fileOutcome.concat(res));
+      } else if (option == 'pdf转ppt') {
+        const res = await pdfToPpt();
+        setFileOutcome(fileOutcome => fileOutcome.concat(res));
+      } else if (option == 'pdf转excel') {
+        const res = await pdfToExcel();
+        setFileOutcome(fileOutcome => fileOutcome.concat(res));
+      } else if (option == 'pdf转word') {
+        const res = await pdfToWord();
+        setFileOutcome(fileOutcome => fileOutcome.concat(res));
+      } else if (option == '图片转word') {
+        const res = await imgToWord();
         setFileOutcome(fileOutcome => fileOutcome.concat(res));
       } else {
         console.log('unknown function');

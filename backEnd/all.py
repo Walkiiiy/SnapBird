@@ -103,7 +103,9 @@ class CommonOcr(object):
             head['x-ti-app-id'] = self._app_id
             head['x-ti-secret-code'] = self._secret_code
             result = requests.post(url, data=image, headers=head)
-            return result.text
+            result = (json.loads(result.text).get(
+                'result', {}))
+            return result
         except Exception as e:
             print(e)
             return 0
@@ -117,7 +119,9 @@ class CommonOcr(object):
             head['x-ti-app-id'] = self._app_id
             head['x-ti-secret-code'] = self._secret_code
             result = requests.post(url, data=image, headers=head)
-            return result.text
+            result = (json.loads(result.text).get(
+                'result', {}))
+            return result
         except Exception as e:
             print(e)
             return 0
@@ -131,7 +135,9 @@ class CommonOcr(object):
             head['x-ti-app-id'] = self._app_id
             head['x-ti-secret-code'] = self._secret_code
             result = requests.post(url, data=image, headers=head)
-            return result.text
+            result = (json.loads(result.text).get(
+                'result', {}))
+            return result
         except Exception as e:
             print(e)
             return 0
@@ -220,6 +226,22 @@ class CommonOcr(object):
             result = requests.post(url, data=image, headers=head)
             result = (json.loads(result.text).get(
                 'result', {}))
+            return result
+        except Exception as e:
+            print(e)
+            return 0
+
+    def img_to_word(self):
+        # 图片转word
+        url = 'https://api.textin.com/robot/v1.0/api/doc_restore'
+        head = {}
+        try:
+            image = get_file_content(self._img_path)
+            head['x-ti-app-id'] = self._app_id
+            head['x-ti-secret-code'] = self._secret_code
+            result = requests.post(url, data=image, headers=head)
+            result = (json.loads(result.text).get(
+                'result', {}).get('docx', {}))
             return result
         except Exception as e:
             print(e)
