@@ -1,15 +1,6 @@
 import os
 
 
-def is_image(filename):
-    # 定义一个图片扩展名列表
-    valid_extensions = ['.jpg', '.jpeg', '.png', '.gif']
-    # 获取文件的扩展名
-    extension = os.path.splitext(filename)[1].lower()
-    # 判断文件的扩展名是否在有效扩展名列表中
-    return extension in valid_extensions
-
-
 def determine_file_type(filename):
     # 文件类型映射
     file_type_map = {
@@ -20,9 +11,13 @@ def determine_file_type(filename):
         'excel': ['.xls', '.xlsx', '.csv']
     }
 
-    # 获取文件的扩展名（转换为小写）
-    _, extension = os.path.splitext(filename)
-    extension = extension.lower()
+    # 特殊情况处理：当文件名就是扩展名时（如“.pdf”）
+    if filename.startswith(".") and os.path.splitext(filename)[1] == "":
+        extension = filename  # 在这种情况下，整个字符串都是“扩展名”
+    else:
+        # 获取文件的扩展名（转换为小写）
+        _, extension = os.path.splitext(filename)
+        extension = extension.lower()
 
     # 遍历映射来决定文件类型
     for file_type, extensions in file_type_map.items():

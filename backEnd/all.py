@@ -145,7 +145,9 @@ class CommonOcr(object):
             head['x-ti-app-id'] = self._app_id
             head['x-ti-secret-code'] = self._secret_code
             result = requests.post(url, data=image, headers=head)
-            return result.text
+            result = (json.loads(result.text).get(
+                'result', {}))
+            return result
         except Exception as e:
             print(e)
             return 0
@@ -189,7 +191,7 @@ class CommonOcr(object):
             'x-ti-secret-code': self._secret_code,
             'Content-Type': 'application/json'
         }
-
+        # 这里特别要求要图片的base64
         base64_image = get_file_base64(self._img_path)
 
         # 构建JSON请求体

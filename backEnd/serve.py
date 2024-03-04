@@ -68,6 +68,7 @@ def gpt_chat():
 def upload_file():
     uploaded_file = request.files['file']
     fileNames.append(uploaded_file.filename)
+    print('upload file:', uploaded_file.filename)
     if uploaded_file.filename != '':
         fileType = determine_file_type(uploaded_file.filename)
         fileTypes.append(fileType)
@@ -326,6 +327,77 @@ def excel_to_pdf():
                 })
             else:
                 print('something went wrong with all/excel_to_pdf.')
+        except Exception as e:
+            print(f"Error processing file {filename}: {e}")
+            results.append({
+                'file_name': str(random.randint(100, 999))+filename,
+                'error': str(e)
+            })
+    return jsonify({
+        'message': 'Files processed successfully',
+        'results': results
+    })
+
+
+@app.route('/word_to_pdf', methods=['GET'])  # word转pdf
+def word_to_pdf():
+    results = []
+    try:
+        files = os.listdir(wordPath)  # 列出目录下所有文件
+    except Exception as e:
+        return jsonify({'message': 'Error listing input directory', 'error': str(e)})
+    for i, filename in enumerate(files):
+        file_path = os.path.join(wordPath, filename)
+        try:
+            common_ocr = CommonOcr(file_path)
+            res = common_ocr.word_to_pdf()
+            if res:
+                results.append({
+                    'file_name': str(random.randint(100, 999))+filename+'.pdf',
+                    'res': res,
+                })
+            else:
+                print('something went wrong with all/word_to_pdf.')
+        except Exception as e:
+            print(f"Error processing file {filename}: {e}")
+            results.append({
+                'file_name': str(random.randint(100, 999))+filename,
+                'error': str(e)
+            })
+    return jsonify({
+        'message': 'Files processed successfully',
+        'results': results
+    })
+
+
+@app.route('/pdf_to_image', methods=['GET'])  # pdf转图片
+def pdf_to_image():
+    results = []
+    try:
+        files = os.listdir(pdfPath)  # 列出目录下所有文件
+    except Exception as e:
+        return jsonify({'message': 'Error listing input directory', 'error': str(e)})
+    for i, filename in enumerate(files):
+        file_path = os.path.join(pdfPath, filename)
+        try:
+            common_ocr = CommonOcr(file_path)
+            res = common_ocr.pdf_to_img()
+            if res:
+                zip_bytes = base64.b64decode(res)
+                # 使用io.BytesIO创建一个类文件对象
+                zip_stream = io.BytesIO(zip_bytes)
+                # 使用zipfile读取类文件对象
+                with zipfile.ZipFile(zip_stream, 'r') as zip_ref:
+                    zip_ref.extractall(tempPath)
+                base64_files = get_files_base64_andRemove(tempPath)
+                for item in base64_files:
+                    results.append({
+                        'file_name': str(random.randint(100, 999))+item[0]+'.jpg',
+                        'res': item[1]
+                    })
+
+            else:
+                print('something went wrong with all/pdf_to_img.')
         except Exception as e:
             print(f"Error processing file {filename}: {e}")
             results.append({

@@ -43,6 +43,8 @@ import {
   wordToImage,
   imageToPdf,
   excelToPdf,
+  wordToPdf,
+  pdfToImg,
 } from '../interfaces/main';
 
 export default function HomeScreen({navigation}) {
@@ -183,6 +185,12 @@ export default function HomeScreen({navigation}) {
         setFileOutcome(fileOutcome => fileOutcome.concat(res));
       } else if (option == 'excel转pdf') {
         const res = await excelToPdf();
+        setFileOutcome(fileOutcome => fileOutcome.concat(res));
+      } else if (option == 'word转pdf') {
+        const res = await wordToPdf();
+        setFileOutcome(fileOutcome => fileOutcome.concat(res));
+      } else if (option == 'pdf转图片') {
+        const res = await pdfToImg();
         setFileOutcome(fileOutcome => fileOutcome.concat(res));
       } else {
         console.log('unknown function');

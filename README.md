@@ -14,3 +14,7 @@ A demo app for image processing.
 * Excel转PDF：提供高并发高可靠的API，将Excel文档转换为PDF。转换出的文件尽可能保持Excel原有格式，强化易读性。
 * 图片转PDF：提供高并发高可靠的API，将图片文档转换为PDF。转换出的文件尽可能保持图片原有格式，强化易读性。
 * Word转图片：提供高并发高可靠的API，将Word文档转换为图片。转换出的文件尽可能保持Word文档原有格式，强化易读性。
+  
+### bugs:
+* 中文文件名丢失
+* 并发性问题
