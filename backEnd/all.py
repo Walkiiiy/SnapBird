@@ -9,6 +9,12 @@ def get_file_content(filePath):
         return fp.read()
 
 
+def get_file_base64(filePath):
+    with open(filePath, 'rb') as fp:
+        image_content = fp.read()
+    return base64.b64encode(image_content).decode('utf-8')
+
+
 class CommonOcr(object):
     def __init__(self, img_path):
         # 请登录后前往 “工作台-账号设置-开发者信息” 查看 x-ti-app-id
@@ -153,7 +159,9 @@ class CommonOcr(object):
             head['x-ti-app-id'] = self._app_id
             head['x-ti-secret-code'] = self._secret_code
             result = requests.post(url, data=image, headers=head)
-            return result.text
+            result = (json.loads(result.text).get(
+                'result', {}))
+            return result
         except Exception as e:
             print(e)
             return 0
@@ -167,21 +175,34 @@ class CommonOcr(object):
             head['x-ti-app-id'] = self._app_id
             head['x-ti-secret-code'] = self._secret_code
             result = requests.post(url, data=image, headers=head)
-            return result.text
+            result = (json.loads(result.text).get(
+                'result', {}))
+            return result
         except Exception as e:
             print(e)
             return 0
 
     def img_to_pdf(self):
-        # 图片转PDF
         url = 'https://api.textin.com/ai/service/v1/file-convert/image-to-pdf'
-        head = {}
+        headers = {
+            'x-ti-app-id': self._app_id,
+            'x-ti-secret-code': self._secret_code,
+            'Content-Type': 'application/json'
+        }
+
+        base64_image = get_file_base64(self._img_path)
+
+        # 构建JSON请求体
+        payload = json.dumps({
+            "files": [base64_image]  # 可以添加更多的图片Base64字符串
+        })
+
         try:
-            image = get_file_content(self._img_path)
-            head['x-ti-app-id'] = self._app_id
-            head['x-ti-secret-code'] = self._secret_code
-            result = requests.post(url, data=image, headers=head)
-            return result.text
+            # 发送请求
+            result = requests.post(url, data=payload, headers=headers)
+            result = (json.loads(result.text).get(
+                'result', {}))
+            return result
         except Exception as e:
             print(e)
             return 0

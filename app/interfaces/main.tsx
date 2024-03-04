@@ -106,6 +106,48 @@ export async function wordToImage() {
   }
 }
 
+export async function imageToPdf() {
+  console.log('main:imageToPdf');
+  const Url = url + 'img_to_pdf';
+  try {
+    const response = await axios.get(Url);
+    //存储文件到内部
+    // for (let i in response.data.results) {
+    //   paths.push(
+    //     saveFile(
+    //       response.data.results[i].file_name,
+    //       response.data.results[i].res,
+    //     ),
+    //   );
+    // }
+    return response.data.results;
+  } catch (error) {
+    // Handle errors here
+    console.error('Error fetching the pic file: ', error);
+    throw error; // Rethrow or handle as needed
+  }
+}
+export async function excelToPdf() {
+  console.log('main:excelToPdf');
+  const Url = url + 'excel_to_pdf';
+  try {
+    const response = await axios.get(Url);
+    //存储文件到内部
+    // for (let i in response.data.results) {
+    //   paths.push(
+    //     saveFile(
+    //       response.data.results[i].file_name,
+    //       response.data.results[i].res,
+    //     ),
+    //   );
+    // }
+    return response.data.results;
+  } catch (error) {
+    // Handle errors here
+    console.error('Error fetching the excel file: ', error);
+    throw error; // Rethrow or handle as needed
+  }
+}
 export const uploadFile = async (fileUri, fileName) => {
   // 创建 FormData 对象
   const formData = new FormData();

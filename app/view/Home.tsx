@@ -41,6 +41,8 @@ import {
   cropEnhanceInterface,
   waterMarkRemove,
   wordToImage,
+  imageToPdf,
+  excelToPdf,
 } from '../interfaces/main';
 
 export default function HomeScreen({navigation}) {
@@ -175,6 +177,12 @@ export default function HomeScreen({navigation}) {
         setFileOutcome(fileOutcome => fileOutcome.concat(res));
       } else if (option == 'word转图片') {
         const res = await wordToImage();
+        setFileOutcome(fileOutcome => fileOutcome.concat(res));
+      } else if (option == '图片转pdf') {
+        const res = await imageToPdf();
+        setFileOutcome(fileOutcome => fileOutcome.concat(res));
+      } else if (option == 'excel转pdf') {
+        const res = await excelToPdf();
         setFileOutcome(fileOutcome => fileOutcome.concat(res));
       } else {
         console.log('unknown function');

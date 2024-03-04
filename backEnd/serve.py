@@ -27,7 +27,7 @@ print('current fileName:', fileNames)
 print('current fileType:', fileTypes)
 
 
-def get_files_base64_andRemove(directory):
+def get_files_base64_andRemove(directory):  # 从zip提取文件，转base64，并删除源文件
     base64_files = []
     for root, dirs, files in os.walk(directory):
         for file in files:
@@ -36,6 +36,8 @@ def get_files_base64_andRemove(directory):
                 file_content = file_to_encode.read()
                 base64_content = base64.b64encode(file_content).decode('utf-8')
                 base64_files.append((file, base64_content))
+            if os.path.exists(file_path):
+                os.remove(file_path)
     return base64_files
 
 
@@ -262,6 +264,68 @@ def word_to_img():
                     })
             else:
                 print('something went wrong with all/word_to_img.')
+        except Exception as e:
+            print(f"Error processing file {filename}: {e}")
+            results.append({
+                'file_name': str(random.randint(100, 999))+filename,
+                'error': str(e)
+            })
+    return jsonify({
+        'message': 'Files processed successfully',
+        'results': results
+    })
+
+
+@app.route('/img_to_pdf', methods=['GET'])  # image转pdf
+def img_to_pdf():
+    results = []
+    try:
+        files = os.listdir(picPath)  # 列出目录下所有文件
+    except Exception as e:
+        return jsonify({'message': 'Error listing input directory', 'error': str(e)})
+    for i, filename in enumerate(files):
+        file_path = os.path.join(picPath, filename)
+        try:
+            common_ocr = CommonOcr(file_path)
+            res = common_ocr.img_to_pdf()
+            if res:
+                results.append({
+                    'file_name': str(random.randint(100, 999))+filename+'.pdf',
+                    'res': res,
+                })
+            else:
+                print('something went wrong with all/img_to_pdf.')
+        except Exception as e:
+            print(f"Error processing file {filename}: {e}")
+            results.append({
+                'file_name': str(random.randint(100, 999))+filename,
+                'error': str(e)
+            })
+    return jsonify({
+        'message': 'Files processed successfully',
+        'results': results
+    })
+
+
+@app.route('/excel_to_pdf', methods=['GET'])  # excel转pdf
+def excel_to_pdf():
+    results = []
+    try:
+        files = os.listdir(excelPath)  # 列出目录下所有文件
+    except Exception as e:
+        return jsonify({'message': 'Error listing input directory', 'error': str(e)})
+    for i, filename in enumerate(files):
+        file_path = os.path.join(excelPath, filename)
+        try:
+            common_ocr = CommonOcr(file_path)
+            res = common_ocr.excel_to_pdf()
+            if res:
+                results.append({
+                    'file_name': str(random.randint(100, 999))+filename+'.pdf',
+                    'res': res,
+                })
+            else:
+                print('something went wrong with all/excel_to_pdf.')
         except Exception as e:
             print(f"Error processing file {filename}: {e}")
             results.append({
