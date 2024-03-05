@@ -25,6 +25,8 @@ import SendMessageButton from '../componments/SendMessageButton';
 import PicShow from '../componments/PicShow';
 import UploadMenu from '../componments/UploadMenu';
 import * as FileShow from '../componments/FileShow';
+import ShowMoreButton from '../componments/ShowMoreButton';
+import AllFunctionsModal from '../componments/AllFunctionsModal';
 
 import {
   UserContext,
@@ -60,6 +62,7 @@ export default function HomeScreen({navigation}) {
 
   const [text, setText] = React.useState('');
   const [modalVisible, setModalVisible] = React.useState(true);
+  const [allFunctionsVisible, setAllFunctionsVisible] = React.useState(false);
   const [menuVisible, setMenuVisible] = React.useState(false);
   const [picVisible, setPicVisible] = React.useState(false);
   const [uploadMenuVisible, setUploadMenuVisible] = React.useState(false);
@@ -155,6 +158,7 @@ export default function HomeScreen({navigation}) {
   //处理快速开始选择
   async function quickStart(option: string) {
     console.log(`Selected option: ${option}`);
+    setAllFunctionsVisible(false);
     setShowTextBox(false);
     if (fileUpload.length == 0) {
       setTitle1('请先上传图片或文件！！');
@@ -351,6 +355,11 @@ export default function HomeScreen({navigation}) {
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
       />
+      <AllFunctionsModal
+        handleSelect={quickStart}
+        visible={allFunctionsVisible}
+        onClose={() => setAllFunctionsVisible(false)}
+      />
       <SideMenu
         visible={menuVisible}
         onClose={() => setMenuVisible(false)}
@@ -496,6 +505,11 @@ export default function HomeScreen({navigation}) {
       <View style={styles.shortCutArea}>
         <View style={styles.functionTitleArea}>
           <Text style={styles.functionTitle}>{title1}</Text>
+          <ShowMoreButton
+            onPress={() => {
+              setAllFunctionsVisible(true);
+            }}
+          />
         </View>
         <View style={styles.selectionArea}>
           <Functions handleSelect={quickStart} />
@@ -622,6 +636,7 @@ const styles = StyleSheet.create({
   },
   functionTitleArea: {
     flex: 1,
+    flexDirection: 'row',
   },
   activityIndicatorContainer: {
     flex: 1,
