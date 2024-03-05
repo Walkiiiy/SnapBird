@@ -47,8 +47,6 @@ function CustomModal({handleSelect, visible, onClose}) {
       onRequestClose={onClose}>
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-          <Text style={styles.modalTitle}>全部功能</Text>
-
           <ScrollView>
             <Text style={styles.modalContent}>图像处理</Text>
             <View style={styles.functionContainer}>
@@ -92,13 +90,6 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-  modalTitle: {
-    color: 'white',
-    marginBottom: 15,
-    textAlign: 'center',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
   modalContent: {
     color: 'white',
     marginBottom: 15,
@@ -123,7 +114,7 @@ const styles = StyleSheet.create({
     width: '30%',
     height: 95,
     margin: 5,
-    backgroundColor: '#444444',
+    backgroundColor: '#0a5c5c',
     borderRadius: 20,
     marginVertical: 5, // 调整垂直边距，确保纵向间隔
     paddingVertical: 8,
