@@ -41,8 +41,195 @@ def get_files_base64_andRemove(directory):  # 从zip提取文件，转base64，�
     return base64_files
 
 
-@app.route('/chat', methods=['GET'])
+def clearDir(directory):  # 清空文件夹
+    file_names = os.listdir(directory)
+    for item in file_names:
+        file_path = os.path.join(directory, item)
+        os.remove(file_path)
+
+
+def handleMutipleOperation(operations):  # 按需调用api，返回文件base64列表
+    while operations:  # 将返回的结果提取并存储，改变res路径
+        opt = operations.pop(0)
+        if opt == '1':  # 模型调用ocr还没想好怎么写，而且目前代码不支持并行操作请求，即每次只能完成一个请求
+            try:
+                result = recognize()
+                result = result.json['results']
+            except Exception as e:
+                print(e)
+        elif opt == '2':
+            try:
+                print('modal is calling opt2')
+                result = table()
+                clearDir(modelTempPath)
+                result = result.json['results']
+                for item in result:
+                    fileName = item['file_name']
+                    file_path = os.path.join(modelTempPath, fileName)
+                    file_data = base64.b64decode(item['res'])
+                    with open(file_path, 'wb') as file:
+                        file.write(file_data)
+            except Exception as e:
+                print(e)
+        elif opt == '3':
+            try:
+                print('modal is calling opt3')
+                result = cropEnhance()
+                clearDir(modelTempPath)
+                result = result.json['results']
+                for item in result:
+                    fileName = item['file_name']
+                    file_path = os.path.join(modelTempPath, fileName)
+                    file_data = base64.b64decode(item['res'])
+                    with open(file_path, 'wb') as file:
+                        file.write(file_data)
+            except Exception as e:
+                print(e)
+        elif opt == '4':
+            try:
+                print('modal is calling opt4')
+                result = img_to_word()
+                clearDir(modelTempPath)
+                result = result.json['results']
+                for item in result:
+                    fileName = item['file_name']
+                    file_path = os.path.join(modelTempPath, fileName)
+                    file_data = base64.b64decode(item['res'])
+                    with open(file_path, 'wb') as file:
+                        file.write(file_data)
+            except Exception as e:
+                print(e)
+        elif opt == '5':
+            try:
+                print('modal is calling opt5')
+                result = pdf_to_word()
+                clearDir(modelTempPath)
+                result = result.json['results']
+                for item in result:
+                    fileName = item['file_name']
+                    file_path = os.path.join(modelTempPath, fileName)
+                    file_data = base64.b64decode(item['res'])
+                    with open(file_path, 'wb') as file:
+                        file.write(file_data)
+            except Exception as e:
+                print(e)
+        elif opt == '6':
+            try:
+                print('modal is calling opt6')
+                result = pdf_to_excel()
+                clearDir(modelTempPath)
+                result = result.json['results']
+                for item in result:
+                    fileName = item['file_name']
+                    file_path = os.path.join(modelTempPath, fileName)
+                    file_data = base64.b64decode(item['res'])
+                    with open(file_path, 'wb') as file:
+                        file.write(file_data)
+            except Exception as e:
+                print(e)
+        elif opt == '7':
+            try:
+                print('modal is calling opt7')
+                result = pdf_to_ppt()
+                clearDir(modelTempPath)
+                result = result.json['results']
+                for item in result:
+                    fileName = item['file_name']
+                    file_path = os.path.join(modelTempPath, fileName)
+                    file_data = base64.b64decode(item['res'])
+                    with open(file_path, 'wb') as file:
+                        file.write(file_data)
+            except Exception as e:
+                print(e)
+        elif opt == '8':
+            try:
+                print('modal is calling opt8')
+                result = pdf_to_image()
+                clearDir(modelTempPath)
+                result = result.json['results']
+                for item in result:
+                    fileName = item['file_name']
+                    file_path = os.path.join(modelTempPath, fileName)
+                    file_data = base64.b64decode(item['res'])
+                    with open(file_path, 'wb') as file:
+                        file.write(file_data)
+            except Exception as e:
+                print(e)
+        elif opt == '9':
+            try:
+                print('modal is calling opt9')
+                result = word_to_pdf()
+                clearDir(modelTempPath)
+                result = result.json['results']
+                for item in result:
+                    fileName = item['file_name']
+                    file_path = os.path.join(modelTempPath, fileName)
+                    file_data = base64.b64decode(item['res'])
+                    with open(file_path, 'wb') as file:
+                        file.write(file_data)
+            except Exception as e:
+                print(e)
+        elif opt == '10':
+            try:
+                print('modal is calling opt10')
+                result = excel_to_pdf()
+                clearDir(modelTempPath)
+                result = result.json['results']
+                for item in result:
+                    fileName = item['file_name']
+                    file_path = os.path.join(modelTempPath, fileName)
+                    file_data = base64.b64decode(item['res'])
+                    with open(file_path, 'wb') as file:
+                        file.write(file_data)
+            except Exception as e:
+                print(e)
+        elif opt == '11':
+            try:
+                print('modal is calling opt11')
+                result = img_to_pdf()
+                clearDir(modelTempPath)
+                result = result.json['results']
+                for item in result:
+                    fileName = item['file_name']
+                    file_path = os.path.join(modelTempPath, fileName)
+                    file_data = base64.b64decode(item['res'])
+                    with open(file_path, 'wb') as file:
+                        file.write(file_data)
+            except Exception as e:
+                print(e)
+        elif opt == '12':
+            try:
+                print('modal is calling opt12')
+                result = word_to_img()
+                clearDir(modelTempPath)
+                result = result.json['results']
+                for item in result:
+                    fileName = item['file_name']
+                    file_path = os.path.join(modelTempPath, fileName)
+                    file_data = base64.b64decode(item['res'])
+                    with open(file_path, 'wb') as file:
+                        file.write(file_data)
+            except Exception as e:
+                print(e)
+        # 不要忘了最后清理modelTemp文件夹
+    results = []
+    filenames = os.listdir(modelTempPath)
+    for filename in filenames:
+        with open(os.path.join(modelTempPath, filename), 'rb') as file:
+            file_content = file.read()
+        file_content = base64.b64encode(file_content).decode('utf-8')
+        results.append({
+            'file_name': str(random.randint(100, 999))+filename,
+            'res': file_content
+        })
+    clearDir(modelTempPath)
+    return results
+
+
+@app.route('/chat', methods=['GET'])  # 目前缺少文件类型合法性鉴别
 def gpt_chat():
+    if not fileNames:
+        return jsonify({'response': '请先上传文件哦', 'results': []})
     try:
         message = request.args.get('message')
         if not message:
@@ -53,15 +240,23 @@ def gpt_chat():
                 print(response)
                 response = json.loads(response)
                 if response['type'] == 'operation':
-                    return jsonify({'response': '请稍后，处理结果将在文件区展示:)'})
+                    results = handleMutipleOperation(
+                        response['content'].split(','))
+
+                    return jsonify({'response': '当然可以！以上是您的文件处理结果 :)',
+                                    'results': results
+                                    })
                 elif response['type'] == 'rejection':
-                    return jsonify({'response': response['content']})
-            except Exception as e:  # 无法json化
-                return jsonify({'response': 'gpt returned an incorrect form(probably not json)', })
+                    return jsonify({'response': response['content'], 'results': []})
+            except Exception as e:
+                print('erro in serve/chat/response_processing', e)
+                return jsonify({'response': 'erro in serve/chat/response_processing', 'results': []})
         else:
-            return jsonify({'error': 'gpt session is unavilible.'})
+            print('gpt session is unavilible.')
+            return jsonify({'response': 'gpt session is unavilible.', 'results': []})
     except Exception as e:
-        return jsonify({'error': e})
+        print('error in serve/gpt_chat/chat', e)
+        return jsonify({'response': 'error in serve/gpt_chat/chat', 'results': []})
 
 
 @app.route('/upload', methods=['POST'])  # 逐个上传文件，根据文件类型分类存储
@@ -115,14 +310,19 @@ def del_file():
 @app.route('/recognize', methods=['GET'])  # 批量文字识别image->文本
 def recognize():
     try:
-        files = os.listdir(picPath)  # 列出目录下所有文件
+        files = os.listdir(modelTempPath)
+        if not files:
+            files = os.listdir(picPath)
+            dirpath = picPath
+        else:
+            dirpath = modelTempPath
     except Exception as e:
         return jsonify({'message': 'Error listing input directory', 'error': str(e)})
 
     results = []
 
     for i, filename in enumerate(files):
-        file_path = os.path.join(picPath, filename)
+        file_path = os.path.join(dirpath, filename)
         try:
             common_ocr = CommonOcr(file_path)
             texts = common_ocr.recognize()
@@ -149,11 +349,16 @@ def recognize():
 def table():
     results = []
     try:
-        files = os.listdir(picPath)  # 列出目录下所有文件
+        files = os.listdir(modelTempPath)
+        if not files:
+            files = os.listdir(picPath)  # 列出目录下所有文件
+            dirpath = picPath
+        else:
+            dirpath = modelTempPath
     except Exception as e:
         return jsonify({'message': 'Error listing input directory', 'error': str(e)})
     for i, filename in enumerate(files):
-        file_path = os.path.join(picPath, filename)
+        file_path = os.path.join(dirpath, filename)
         try:
             common_ocr = CommonOcr(file_path)
             excel = common_ocr.tableRecognize()
@@ -180,11 +385,16 @@ def table():
 def cropEnhance():
     results = []
     try:
-        files = os.listdir(picPath)  # 列出目录下所有文件
+        files = os.listdir(modelTempPath)
+        if not files:
+            files = os.listdir(picPath)  # 列出目录下所有文件
+            dirpath = picPath
+        else:
+            dirpath = modelTempPath
     except Exception as e:
         return jsonify({'message': 'Error listing input directory', 'error': str(e)})
     for i, filename in enumerate(files):
-        file_path = os.path.join(picPath, filename)
+        file_path = os.path.join(dirpath, filename)
         try:
             common_ocr = CommonOcr(file_path)
             res = common_ocr.crop_enhance_image()
@@ -211,11 +421,16 @@ def cropEnhance():
 def waterMarkRemove():
     results = []
     try:
-        files = os.listdir(picPath)  # 列出目录下所有文件
+        files = os.listdir(modelTempPath)
+        if not files:
+            files = os.listdir(picPath)  # 列出目录下所有文件
+            dirpath = picPath
+        else:
+            dirpath = modelTempPath
     except Exception as e:
         return jsonify({'message': 'Error listing input directory', 'error': str(e)})
     for i, filename in enumerate(files):
-        file_path = os.path.join(picPath, filename)
+        file_path = os.path.join(dirpath, filename)
         try:
             common_ocr = CommonOcr(file_path)
             res = common_ocr.watermark_remove()
@@ -242,11 +457,16 @@ def waterMarkRemove():
 def word_to_img():
     results = []
     try:
-        files = os.listdir(wordPath)  # 列出目录下所有文件
+        files = os.listdir(modelTempPath)
+        if not files:
+            files = os.listdir(wordPath)  # 列出目录下所有文件
+            dirpath = wordPath
+        else:
+            dirpath = modelTempPath
     except Exception as e:
         return jsonify({'message': 'Error listing input directory', 'error': str(e)})
     for i, filename in enumerate(files):
-        file_path = os.path.join(wordPath, filename)
+        file_path = os.path.join(dirpath, filename)
         try:
             common_ocr = CommonOcr(file_path)
             res = common_ocr.word_to_img()
@@ -281,11 +501,16 @@ def word_to_img():
 def img_to_pdf():
     results = []
     try:
-        files = os.listdir(picPath)  # 列出目录下所有文件
+        files = os.listdir(modelTempPath)
+        if not files:
+            files = os.listdir(picPath)  # 列出目录下所有文件
+            dirpath = picPath
+        else:
+            dirpath = modelTempPath
     except Exception as e:
         return jsonify({'message': 'Error listing input directory', 'error': str(e)})
     for i, filename in enumerate(files):
-        file_path = os.path.join(picPath, filename)
+        file_path = os.path.join(dirpath, filename)
         try:
             common_ocr = CommonOcr(file_path)
             res = common_ocr.img_to_pdf()
@@ -312,11 +537,16 @@ def img_to_pdf():
 def excel_to_pdf():
     results = []
     try:
-        files = os.listdir(excelPath)  # 列出目录下所有文件
+        files = os.listdir(modelTempPath)
+        if not files:
+            files = os.listdir(excelPath)  # 列出目录下所有文件
+            dirpath = excelPath
+        else:
+            dirpath = modelTempPath
     except Exception as e:
         return jsonify({'message': 'Error listing input directory', 'error': str(e)})
     for i, filename in enumerate(files):
-        file_path = os.path.join(excelPath, filename)
+        file_path = os.path.join(dirpath, filename)
         try:
             common_ocr = CommonOcr(file_path)
             res = common_ocr.excel_to_pdf()
@@ -343,11 +573,16 @@ def excel_to_pdf():
 def word_to_pdf():
     results = []
     try:
-        files = os.listdir(wordPath)  # 列出目录下所有文件
+        files = os.listdir(modelTempPath)
+        if not files:
+            files = os.listdir(wordPath)  # 列出目录下所有文件
+            dirpath = wordPath
+        else:
+            dirpath = modelTempPath
     except Exception as e:
         return jsonify({'message': 'Error listing input directory', 'error': str(e)})
     for i, filename in enumerate(files):
-        file_path = os.path.join(wordPath, filename)
+        file_path = os.path.join(dirpath, filename)
         try:
             common_ocr = CommonOcr(file_path)
             res = common_ocr.word_to_pdf()
@@ -374,11 +609,16 @@ def word_to_pdf():
 def pdf_to_image():
     results = []
     try:
-        files = os.listdir(pdfPath)  # 列出目录下所有文件
+        files = os.listdir(modelTempPath)
+        if not files:
+            files = os.listdir(pdfPath)  # 列出目录下所有文件
+            dirpath = pdfPath
+        else:
+            dirpath = modelTempPath
     except Exception as e:
         return jsonify({'message': 'Error listing input directory', 'error': str(e)})
     for i, filename in enumerate(files):
-        file_path = os.path.join(pdfPath, filename)
+        file_path = os.path.join(dirpath, filename)
         try:
             common_ocr = CommonOcr(file_path)
             res = common_ocr.pdf_to_img()
@@ -414,11 +654,16 @@ def pdf_to_image():
 def pdf_to_ppt():
     results = []
     try:
-        files = os.listdir(pdfPath)  # 列出目录下所有文件
+        files = os.listdir(modelTempPath)
+        if not files:
+            files = os.listdir(pdfPath)  # 列出目录下所有文件
+            dirpath = pdfPath
+        else:
+            dirpath = modelTempPath
     except Exception as e:
         return jsonify({'message': 'Error listing input directory', 'error': str(e)})
     for i, filename in enumerate(files):
-        file_path = os.path.join(pdfPath, filename)
+        file_path = os.path.join(dirpath, filename)
         try:
             common_ocr = CommonOcr(file_path)
             res = common_ocr.pdf_to_ppt()
@@ -445,11 +690,16 @@ def pdf_to_ppt():
 def pdf_to_excel():
     results = []
     try:
-        files = os.listdir(pdfPath)  # 列出目录下所有文件
+        files = os.listdir(modelTempPath)
+        if not files:
+            files = os.listdir(pdfPath)  # 列出目录下所有文件
+            dirpath = pdfPath
+        else:
+            dirpath = modelTempPath
     except Exception as e:
         return jsonify({'message': 'Error listing input directory', 'error': str(e)})
     for i, filename in enumerate(files):
-        file_path = os.path.join(pdfPath, filename)
+        file_path = os.path.join(dirpath, filename)
         try:
             common_ocr = CommonOcr(file_path)
             res = common_ocr.pdf_to_excel()
@@ -476,11 +726,16 @@ def pdf_to_excel():
 def pdf_to_word():
     results = []
     try:
-        files = os.listdir(pdfPath)  # 列出目录下所有文件
+        files = os.listdir(modelTempPath)
+        if not files:
+            files = os.listdir(pdfPath)  # 列出目录下所有文件
+            dirpath = pdfPath
+        else:
+            dirpath = modelTempPath
     except Exception as e:
         return jsonify({'message': 'Error listing input directory', 'error': str(e)})
     for i, filename in enumerate(files):
-        file_path = os.path.join(pdfPath, filename)
+        file_path = os.path.join(dirpath, filename)
         try:
             common_ocr = CommonOcr(file_path)
             res = common_ocr.pdf_to_word()
@@ -507,11 +762,16 @@ def pdf_to_word():
 def img_to_word():
     results = []
     try:
-        files = os.listdir(picPath)  # 列出目录下所有文件
+        files = os.listdir(modelTempPath)
+        if not files:
+            files = os.listdir(picPath)  # 列出目录下所有文件
+            dirpath = picPath
+        else:
+            dirpath = modelTempPath
     except Exception as e:
         return jsonify({'message': 'Error listing input directory', 'error': str(e)})
     for i, filename in enumerate(files):
-        file_path = os.path.join(picPath, filename)
+        file_path = os.path.join(dirpath, filename)
         try:
             common_ocr = CommonOcr(file_path)
             res = common_ocr.img_to_word()

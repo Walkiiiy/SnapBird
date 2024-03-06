@@ -351,7 +351,7 @@ export default function HomeScreen({navigation}) {
       {/* 弹出组件 */}
       <Notice
         title="Hello👋👋"
-        content="这是一个demo app，为了展示项目的概念设计，暂时没有后端功能实现。"
+        content="这是一个demo app，为了展示项目的概念设计，只有部分后端功能实现。"
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
       />

@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     width: '30%',
     height: 95,
     margin: 5,
-    backgroundColor: '#0a5c5c',
+    backgroundColor: '#444444',
     borderRadius: 20,
     marginVertical: 5, // 调整垂直边距，确保纵向间隔
     paddingVertical: 8,

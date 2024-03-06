@@ -18,3 +18,4 @@ A demo app for image processing.
 ### bugs:
 * 中文文件名丢失
 * 并发性问题
+* 去水印被漏掉了？？
