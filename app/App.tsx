@@ -3,9 +3,10 @@ import {View, Text, Button, StyleSheet} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import HomeScreen from './view/Home';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import MeScreen from './view/Me';
 import ChatScreen from './view/Chat';
+import FileView from './view/FileView';
+import PicView from './view/PicView';
 import {
   FileUploadContext,
   FileOutcomeContext,
@@ -39,6 +40,24 @@ function App() {
                     headerTitle: '',
                     headerTransparent: true,
                     headerTintColor: 'white',
+                  }}
+                />
+                <Stack.Screen
+                  name="FileView"
+                  component={FileView}
+                  options={{
+                    headerTitle: '',
+                    headerTransparent: true,
+                    headerTintColor: 'black',
+                  }}
+                />
+                <Stack.Screen
+                  name="PicView"
+                  component={PicView}
+                  options={{
+                    headerTitle: '',
+                    headerTransparent: false,
+                    headerTintColor: 'black',
                   }}
                 />
                 <Stack.Screen

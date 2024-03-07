@@ -13,8 +13,6 @@ import {
 import {launchImageLibrary, launchCamera} from 'react-native-image-picker';
 import DocumentPicker from 'react-native-document-picker';
 import {useFocusEffect} from '@react-navigation/native';
-import axios from 'axios';
-import RNFS from 'react-native-fs';
 
 import ShortCut from '../componments/ShortCut';
 import UploadButton from '../componments/UploadButton';
@@ -136,7 +134,7 @@ export default function HomeScreen({navigation}) {
   function onChooseSideMenu(id) {
     if (id == 1) {
       navigation.navigate('Chat', {
-        firstMessage: '请帮我……',
+        firstMessage: '你能做什么？',
         fileUploadPass: fileUpload,
       });
     }
@@ -344,6 +342,17 @@ export default function HomeScreen({navigation}) {
       }
     }
   }
+  function goFileView(res, name) {
+    navigation.navigate('FileView', {
+      base64String: res,
+      fileName: name,
+    });
+  }
+  function goPicView(picuri) {
+    navigation.navigate('PicView', {
+      uri: picuri,
+    });
+  }
 
   //home视图
   return (
@@ -396,17 +405,41 @@ export default function HomeScreen({navigation}) {
             {fileUpload.map((uri, index) => {
               if (fileType[index] == 'PDF Document') {
                 return (
-                  <FileShow.PdfShow key={uri} onClose={() => delfile(index)} />
+                  <FileShow.PdfShow
+                    key={uri}
+                    onClose={() => delfile(index)}
+                    onView={async () => {
+                      setTitle1('请转换为图片后预览！');
+                      await wait(3000);
+                      setTitle1('快速开始');
+                    }}
+                    fileName={uri}
+                  />
                 );
               } else if (fileType[index] == 'Word Document') {
                 return (
-                  <FileShow.WordShow key={uri} onClose={() => delfile(index)} />
+                  <FileShow.WordShow
+                    key={uri}
+                    onClose={() => delfile(index)}
+                    onView={async () => {
+                      setTitle1('转换为pdf或图片文件才能预览');
+                      await wait(3000);
+                      setTitle1('快速开始');
+                    }}
+                    fileName={uri}
+                  />
                 );
               } else if (fileType[index] == 'Excel Spreadsheet') {
                 return (
                   <FileShow.ExcelShow
                     key={uri}
                     onClose={() => delfile(index)}
+                    onView={async () => {
+                      setTitle1('转换为pdf或图片文件才能预览！');
+                      await wait(3000);
+                      setTitle1('快速开始');
+                    }}
+                    fileName={uri}
                   />
                 );
               } else if (fileType[index] == 'PowerPoint Presentation') {
@@ -419,6 +452,9 @@ export default function HomeScreen({navigation}) {
                     key={uri}
                     imageUrl={uri}
                     onClose={() => delfile(index)}
+                    onView={() => {
+                      goPicView(uri);
+                    }}
                   />
                 );
               } else {
@@ -444,6 +480,8 @@ export default function HomeScreen({navigation}) {
                     <FileShow.PdfShow
                       key={outcome.file_name}
                       onClose={() => deloutcomefile(index)}
+                      onView={() => goFileView(outcome.res, outcome.file_name)}
+                      fileName={outcome.file_name}
                     />
                   );
                 } else if (getFileType(outcome.file_name) == 'Word Document') {
@@ -451,6 +489,12 @@ export default function HomeScreen({navigation}) {
                     <FileShow.WordShow
                       key={outcome.file_name}
                       onClose={() => deloutcomefile(index)}
+                      onView={async () => {
+                        setTitle1('转换为pdf或图片文件才能预览！');
+                        await wait(3000);
+                        setTitle1('快速开始');
+                      }}
+                      fileName={outcome.file_name}
                     />
                   );
                 } else if (
@@ -460,6 +504,12 @@ export default function HomeScreen({navigation}) {
                     <FileShow.ExcelShow
                       key={outcome.file_name}
                       onClose={() => deloutcomefile(index)}
+                      onView={async () => {
+                        setTitle1('转换为pdf或图片文件才能预览！');
+                        await wait(3000);
+                        setTitle1('快速开始');
+                      }}
+                      fileName={outcome.file_name}
                     />
                   );
                 } else if (
@@ -477,11 +527,10 @@ export default function HomeScreen({navigation}) {
                       key={outcome.file_name}
                       imageUrl={`data:image/jpeg;base64,${outcome.res}`}
                       onClose={() => deloutcomefile(index)}
+                      onView={() => {
+                        goPicView(`data:image/jpeg;base64,${outcome.res}`);
+                      }}
                     />
-                    // <Image
-                    //   source={{uri: `data:image/jpeg;base64,${outcome.res}`}}
-                    //   style={styles.image}
-                    // />
                   );
                 } else {
                   console.log('known type of file!');
@@ -653,5 +702,10 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     borderColor: '#999999',
     color: 'white',
+  },
+  pdf: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
   },
 });

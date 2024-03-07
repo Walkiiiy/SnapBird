@@ -274,6 +274,18 @@ export default function Chat({route, navigation}) {
         return 'Unknown File Type';
     }
   }
+  function goFileView(res, name) {
+    navigation.navigate('FileView', {
+      base64String: res,
+      fileName: name,
+    });
+  }
+  function goPicView(picuri) {
+    navigation.navigate('PicView', {
+      uri: picuri,
+    });
+  }
+
   return (
     <View style={styles.container}>
       {/* 顶部空白条 */}
@@ -306,6 +318,8 @@ export default function Chat({route, navigation}) {
                         <FileShow.PdfShow
                           key={uri}
                           onClose={() => delfile(index)}
+                          onView={() => {}}
+                          fileName={uri}
                         />
                       );
                     } else if (fileType[index] == 'Word Document') {
@@ -313,6 +327,8 @@ export default function Chat({route, navigation}) {
                         <FileShow.WordShow
                           key={uri}
                           onClose={() => delfile(index)}
+                          onView={() => {}}
+                          fileName={uri}
                         />
                       );
                     } else if (fileType[index] == 'Excel Spreadsheet') {
@@ -320,6 +336,8 @@ export default function Chat({route, navigation}) {
                         <FileShow.ExcelShow
                           key={uri}
                           onClose={() => delfile(index)}
+                          onView={() => {}}
+                          fileName={uri}
                         />
                       );
                     } else if (fileType[index] == 'PowerPoint Presentation') {
@@ -335,6 +353,9 @@ export default function Chat({route, navigation}) {
                           key={uri}
                           imageUrl={uri}
                           onClose={() => delfile(index)}
+                          onView={() => {
+                            goPicView(uri);
+                          }}
                         />
                       );
                     } else {
@@ -342,7 +363,6 @@ export default function Chat({route, navigation}) {
                     }
                   })}
                 </ScrollView>
-
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                   {fileOutcome.map((outcome, index) => {
                     console.log(outcome.file_name);
@@ -351,6 +371,10 @@ export default function Chat({route, navigation}) {
                         <FileShow.PdfShow
                           key={outcome.file_name}
                           onClose={() => deloutcomefile(index)}
+                          onView={() =>
+                            goFileView(outcome.res, outcome.file_name)
+                          }
+                          fileName={outcome.file_name}
                         />
                       );
                     } else if (
@@ -360,6 +384,8 @@ export default function Chat({route, navigation}) {
                         <FileShow.WordShow
                           key={outcome.file_name}
                           onClose={() => deloutcomefile(index)}
+                          onView={() => {}}
+                          fileName={outcome.file_name}
                         />
                       );
                     } else if (
@@ -369,6 +395,8 @@ export default function Chat({route, navigation}) {
                         <FileShow.ExcelShow
                           key={outcome.file_name}
                           onClose={() => deloutcomefile(index)}
+                          onView={() => {}}
+                          fileName={outcome.file_name}
                         />
                       );
                     } else if (
@@ -387,18 +415,16 @@ export default function Chat({route, navigation}) {
                           key={outcome.file_name}
                           imageUrl={`data:image/jpeg;base64,${outcome.res}`}
                           onClose={() => deloutcomefile(index)}
+                          onView={() => {
+                            goPicView(`data:image/jpeg;base64,${outcome.res}`);
+                          }}
                         />
-                        // <Image
-                        //   source={{uri: `data:image/jpeg;base64,${outcome.res}`}}
-                        //   style={styles.image}
-                        // />
                       );
                     } else {
                       console.log('known type of file!');
                     }
                   })}
                 </ScrollView>
-
                 <View style={styles.activityIndicatorContainer}>
                   {showActivativeIndicator ? (
                     <ActivityIndicator

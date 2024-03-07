@@ -1,9 +1,11 @@
 import React from 'react';
 import {View, Image, TouchableOpacity, StyleSheet, Text} from 'react-native';
-const SquareImageWithCloseButton = ({imageUrl, onClose}) => {
+const SquareImageWithCloseButton = ({imageUrl, onClose, onView}) => {
   return (
     <View style={styles.container}>
-      <Image source={{uri: imageUrl}} style={styles.image} />
+      <TouchableOpacity onPress={onView}>
+        <Image source={{uri: imageUrl}} style={styles.image} />
+      </TouchableOpacity>
       <TouchableOpacity style={styles.closeButton} onPress={onClose}>
         <Text style={styles.closeButtonText}>X</Text>
       </TouchableOpacity>
@@ -26,9 +28,9 @@ const styles = StyleSheet.create({
     top: -10, // 向上偏移
     right: -10, // 向右偏移
     backgroundColor: '#666666', // 关闭按钮背景颜色
-    width: 20, // 宽度
-    height: 20, // 高度
-    borderRadius: 10, // 设置为宽/高的一半，形成圆形
+    width: 25, // 宽度
+    height: 25, // 高度
+    borderRadius: 12.5, // 设置为宽/高的一半，形成圆形
     justifyContent: 'center', // 内部文字居中
     alignItems: 'center', // 内部文字居中
   },

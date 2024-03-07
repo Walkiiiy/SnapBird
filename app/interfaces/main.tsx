@@ -280,8 +280,6 @@ export async function imgToWord() {
 export const uploadFile = async (fileUri, fileName) => {
   // 创建 FormData 对象
   const formData = new FormData();
-  const extention = getFileExtension(fileUri);
-  const now = new Date();
   var fileType = 'application/octet-stream';
   console.log(fileUri);
   // 添加文件
