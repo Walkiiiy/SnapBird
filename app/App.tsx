@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {View, Text, Button, StyleSheet} from 'react-native';
+import {AppState, StyleSheet} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import HomeScreen from './view/Home';
@@ -13,7 +13,7 @@ import {
   UserContext,
   FileTypeContext,
 } from './Context';
-
+import {sendUserExit} from './interfaces/main';
 const Stack = createNativeStackNavigator();
 
 function App() {
@@ -21,6 +21,28 @@ function App() {
   const [fileOutcome, setFileOutcome] = React.useState([]);
   const [fileUpload, setFileUpload] = React.useState([]);
   const [fileType, setFileType] = React.useState([]);
+  React.useEffect(() => {
+    const handleAppStateChange = nextAppState => {
+      if (nextAppState === 'background' || nextAppState === 'inactive') {
+        // 应用即将进入后台，执行你的操作，如发送GET请求
+        console.log('exited.');
+        sendUserExit();
+        setFileOutcome([]);
+        setFileUpload([]);
+        setFileType([]);
+      }
+    };
+
+    const subscription = AppState.addEventListener(
+      'change',
+      handleAppStateChange,
+    );
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
   return (
     <UserContext.Provider value={{user, setUser}}>
       <FileOutcomeContext.Provider value={{fileOutcome, setFileOutcome}}>

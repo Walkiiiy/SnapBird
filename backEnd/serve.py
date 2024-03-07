@@ -8,6 +8,8 @@ import random
 import zipfile
 import base64
 import io
+from PyPDF2 import PdfMerger
+from docx import Document
 
 from setpath import *
 from utils import determine_file_type
@@ -211,6 +213,35 @@ def handleMutipleOperation(operations):  # 按需调用api，返回文件base64�
                         file.write(file_data)
             except Exception as e:
                 print(e)
+
+        elif opt == '13':
+            try:
+                print('modal is calling opt13')
+                result = waterMarkRemove()
+                clearDir(modelTempPath)
+                result = result.json['results']
+                for item in result:
+                    fileName = item['file_name']
+                    file_path = os.path.join(modelTempPath, fileName)
+                    file_data = base64.b64decode(item['res'])
+                    with open(file_path, 'wb') as file:
+                        file.write(file_data)
+            except Exception as e:
+                print(e)
+        elif opt == '14':
+            try:
+                print('modal is calling opt14')
+                result = merge_pdfs()
+                clearDir(modelTempPath)
+                result = result.json['results']
+                for item in result:
+                    fileName = item['file_name']
+                    file_path = os.path.join(modelTempPath, fileName)
+                    file_data = base64.b64decode(item['res'])
+                    with open(file_path, 'wb') as file:
+                        file.write(file_data)
+            except Exception as e:
+                print(e)
         # 不要忘了最后清理modelTemp文件夹
     results = []
     filenames = os.listdir(modelTempPath)
@@ -226,14 +257,28 @@ def handleMutipleOperation(operations):  # 按需调用api，返回文件base64�
     return results
 
 
+@app.route('/userExit', methods=['GET'])
+def handleUserExit():
+    clearDir(tempPath)
+    clearDir(picPath)
+    clearDir(excelPath)
+    clearDir(modelTempPath)
+    clearDir(wordPath)
+    clearDir(pptPath)
+    clearDir(pdfPath)
+    return jsonify({'message': 'user exited'})
+
+
 @app.route('/chat', methods=['GET'])  # 目前缺少文件类型合法性鉴别
 def gpt_chat():
-    if not fileNames:
-        return jsonify({'response': '请先上传文件哦', 'results': []})
     try:
         message = request.args.get('message')
         if not message:
             return jsonify({'error': 'no message carried!'})
+        if message == "你能做什么？":
+            return jsonify({'response': '我有全面的图像处理、格式转换功能，能识别文字，矫正扭曲变形的文档图片，甚至总结文档的主要内容等等，并能将常用的各种格式文档进行相互转化。\n除此之外，我还支持复杂功能的处理，如果您不仅仅需要进行一项操作，而是进行复杂的多功能复合操作，也请尽管吩咐。例如，您可以说：“提取图片中的表格，再转换为word格式。”', 'results': []})
+        if not fileNames:
+            return jsonify({'response': '请先上传文件，再提要求哦', 'results': []})
         response = chat(message)
         if response:
             try:  # 对gpt模块响应进行处理
@@ -581,6 +626,7 @@ def word_to_pdf():
             dirpath = modelTempPath
     except Exception as e:
         return jsonify({'message': 'Error listing input directory', 'error': str(e)})
+    print(files)
     for i, filename in enumerate(files):
         file_path = os.path.join(dirpath, filename)
         try:
@@ -741,7 +787,7 @@ def pdf_to_word():
             res = common_ocr.pdf_to_word()
             if res:
                 results.append({
-                    'file_name': str(random.randint(100, 999))+filename+'.doc',
+                    'file_name': str(random.randint(100, 999))+filename+'.docx',
                     'res': res,
                 })
             else:
@@ -777,7 +823,7 @@ def img_to_word():
             res = common_ocr.img_to_word()
             if res:
                 results.append({
-                    'file_name': str(random.randint(100, 999))+filename+'.doc',
+                    'file_name': str(random.randint(100, 999))+filename+'.docx',
                     'res': res,
                 })
             else:
@@ -788,6 +834,51 @@ def img_to_word():
                 'file_name': str(random.randint(100, 999))+filename,
                 'error': str(e)
             })
+    return jsonify({
+        'message': 'Files processed successfully',
+        'results': results
+    })
+
+
+@app.route('/merge_pdf', methods=['GET'])  # 合并pdf
+def merge_pdfs(output_filename="merged_output.pdf"):
+    files = os.listdir(modelTempPath)
+    if not files:
+        files = os.listdir(pdfPath)  # 列出目录下所有文件
+        directory_path = pdfPath
+    else:
+        directory_path = modelTempPath
+    """
+    合并指定目录下的所有PDF文件为一个PDF文件。
+
+    :param directory_path: 包含PDF文件的目录路径
+    :param output_filename: 合并后的PDF文件名
+    """
+    # 创建一个PdfMerger对象
+    pdf_merger = PdfMerger()
+
+    # 遍历目录下的所有文件
+    for item in files:
+        if item.endswith('.pdf'):
+            # 构造完整的文件路径
+            pdf_path = os.path.join(directory_path, item)
+            # 将PDF文件添加到合并队列
+            pdf_merger.append(pdf_path)
+            os.remove(pdf_path)
+
+    # 输出合并后的PDF文件
+    output_path = os.path.join(directory_path, output_filename)
+    pdf_merger.write(output_path)
+    pdf_merger.close()
+    results = []
+    with open(output_path, 'rb') as file:
+        file_content = file.read()
+    file_content = base64.b64encode(file_content).decode('utf-8')
+    results.append({
+        'file_name': str(random.randint(100, 999))+output_filename,
+        'res': file_content
+    })
+    os.remove(os.path.join(directory_path, output_filename))
     return jsonify({
         'message': 'Files processed successfully',
         'results': results

@@ -98,6 +98,8 @@ export default function HomeScreen({navigation}) {
       console.log('home获得焦点');
       if (fileUpload.length == 0) {
         setPicVisible(false);
+      } else {
+        setPicVisible(true);
       }
       return () => {
         console.log('home页面失去焦点');

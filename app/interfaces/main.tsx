@@ -313,6 +313,14 @@ export async function delFileInterface(index) {
   }
 }
 
+export async function sendUserExit() {
+  const Url = url + 'userExit';
+  try {
+    const response = await axios.get(Url);
+  } catch (error) {
+    console.log(error);
+  }
+}
 function getFileExtension(filePath) {
   // 按点分割字符串，然后取最后一个元素作为扩展名
   const parts = filePath.split('.');
