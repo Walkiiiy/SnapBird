@@ -256,11 +256,8 @@ def handleMutipleOperation(operations):  # 按需调用api，返回文件base64�
                 clearDir(modelTempPath)
                 result = result.json['results']
                 for item in result:
-                    fileName = item['file_name']
-                    file_path = os.path.join(modelTempPath, fileName)
-                    file_data = base64.b64decode(item['res'])
-                    with open(file_path, 'wb') as file:
-                        file.write(file_data)
+                    textFileNames.append(item['file_name'])
+                    textRes.append('\n'.join(item['res']))
             except Exception as e:
                 print(e)
         # 不要忘了最后清理modelTemp文件夹
@@ -270,7 +267,6 @@ def handleMutipleOperation(operations):  # 按需调用api，返回文件base64�
         with open(os.path.join(modelTempPath, filename), 'rb') as file:
             file_content = file.read()
         file_content = base64.b64encode(file_content).decode('utf-8')
-        print(file_content)
         results.append({
             'file_name': str(random.randint(100, 999))+filename,
             'res': file_content
@@ -278,7 +274,7 @@ def handleMutipleOperation(operations):  # 按需调用api，返回文件base64�
     for index, textcontent in enumerate(textRes):
         results.append({
             'file_name': str(random.randint(100, 999))+textFileNames[index],
-            'res': textcontent
+            'res': [textcontent]
         })
     clearDir(modelTempPath)
     return results
@@ -286,6 +282,8 @@ def handleMutipleOperation(operations):  # 按需调用api，返回文件base64�
 
 @app.route('/userExit', methods=['GET'])
 def handleUserExit():
+    fileNames.clear()
+    fileTypes.clear()
     clearDir(tempPath)
     clearDir(picPath)
     clearDir(excelPath)
@@ -411,7 +409,6 @@ def recognize():
                 'file_name': filename,
                 'error': str(e)
             })
-    print(results)
     return jsonify({
         'message': 'Files processed successfully',
         'results': results

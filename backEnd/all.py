@@ -267,9 +267,10 @@ class CommonOcr(object):
                 'result', {}).get('item_list', {}))
             res = []
             for item in result:
+                res.append(item['key']+':\n')
                 candidates = item['candidates']
-                for item in candidates:
-                    res.append(res['value'])
+                for it in candidates:
+                    res.append(it['value']+'\n')
             return res
         except Exception as e:
             print(e)
