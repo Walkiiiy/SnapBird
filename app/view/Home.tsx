@@ -25,6 +25,7 @@ import UploadMenu from '../componments/UploadMenu';
 import * as FileShow from '../componments/FileShow';
 import ShowMoreButton from '../componments/ShowMoreButton';
 import AllFunctionsModal from '../componments/AllFunctionsModal';
+import TextBox from '../componments/TextBox';
 
 import {
   UserContext,
@@ -69,8 +70,6 @@ export default function HomeScreen({navigation}) {
   const [title2, setTitle2] = React.useState('ShortCut');
   const [showActivativeIndicator, setShowActivativeIndicator] =
     React.useState(false);
-  const [showTextBox, setShowTextBox] = React.useState(false);
-  const [textBoxvalue, setTextBoxValue] = React.useState('');
   //键盘事件监听
   React.useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -128,6 +127,8 @@ export default function HomeScreen({navigation}) {
       case 'bmp':
       case 'svg':
         return 'Image';
+      case 'string':
+        return 'string';
       default:
         return 'Unknown File Type';
     }
@@ -159,7 +160,6 @@ export default function HomeScreen({navigation}) {
   async function quickStart(option: string) {
     console.log(`Selected option: ${option}`);
     setAllFunctionsVisible(false);
-    setShowTextBox(false);
     if (fileUpload.length == 0) {
       setTitle1('请先上传图片或文件！！');
       await wait(1500);
@@ -167,15 +167,8 @@ export default function HomeScreen({navigation}) {
     } else {
       setShowActivativeIndicator(true);
       if (option == '通用文字识别') {
-        const outcome = await ocrInterface();
-        if (outcome == 'server returned a bad signal!') {
-          console.log('server returned a bad signal!');
-        } else {
-          for (let i in outcome) {
-            setTextBoxValue(outcome[0].texts.join('\n'));
-            setShowTextBox(true);
-          }
-        }
+        const res = await ocrInterface();
+        setFileOutcome(fileOutcome => fileOutcome.concat(res));
       } else if (option == '通用表格识别') {
         const res = await tableInterface();
         setFileOutcome(fileOutcome => fileOutcome.concat(res));
@@ -212,6 +205,14 @@ export default function HomeScreen({navigation}) {
       } else if (option == '图片转word') {
         const res = await imgToWord();
         setFileOutcome(fileOutcome => fileOutcome.concat(res));
+      } else if (option == '图像文字信息提取') {
+        setTitle1('请使用ai助手调用此功能');
+        await wait(3000);
+        setTitle1('快速开始');
+      } else if (option == '文件重命名') {
+        setTitle1('请使用ai助手调用此功能');
+        await wait(3000);
+        setTitle1('快速开始');
       } else {
         console.log('unknown function');
       }
@@ -239,7 +240,6 @@ export default function HomeScreen({navigation}) {
         tempArray.splice(index, 1);
         if (tempArray.length === 0) {
           setPicVisible(false);
-          setTextBoxValue(false);
         }
       }
       return tempArray;
@@ -464,20 +464,17 @@ export default function HomeScreen({navigation}) {
               }
             })}
           </ScrollView>
-          {showTextBox ? (
-            <TextInput
-              style={styles.textBox}
-              editable={false}
-              value={textBoxvalue}
-              keyboardType="default" // 键盘类型
-              secureTextEntry={false} // 是否隐藏输入内容，常用于密码输入
-              multiline={true}
-            />
-          ) : (
+          {
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {fileOutcome.map((outcome, index) => {
-                console.log(outcome.file_name);
-                if (getFileType(outcome.file_name) == 'PDF Document') {
+                if (getFileType(outcome.file_name) == 'string') {
+                  return (
+                    <TextBox
+                      key={outcome.file_name}
+                      textValue={outcome.res.join('\n')}
+                    />
+                  );
+                } else if (getFileType(outcome.file_name) == 'PDF Document') {
                   return (
                     <FileShow.PdfShow
                       key={outcome.file_name}
@@ -539,7 +536,7 @@ export default function HomeScreen({navigation}) {
                 }
               })}
             </ScrollView>
-          )}
+          }
           <View style={styles.activityIndicatorContainer}>
             {showActivativeIndicator ? (
               <ActivityIndicator
@@ -695,19 +692,22 @@ const styles = StyleSheet.create({
   activityIndicator: {
     margin: 5,
   },
-  textBox: {
-    flex: 13,
-    height: 40,
+  pdf: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  textBoxContainer: {
+    height: 150,
+    width: 220,
     margin: 7,
+    marginRight: 35,
+  },
+  textBox: {
     borderWidth: 2,
     backgroundColor: '#444444',
     borderRadius: 15,
     borderColor: '#999999',
     color: 'white',
-  },
-  pdf: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
   },
 });

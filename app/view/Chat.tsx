@@ -26,6 +26,7 @@ import PicShow from '../componments/PicShow';
 import * as FileShow from '../componments/FileShow';
 import UploadImgButton from '../componments/UploadButton';
 import UploadMenu from '../componments/UploadMenu';
+import TextBox from '../componments/TextBox';
 
 import {
   UserContext,
@@ -84,16 +85,6 @@ export default function Chat({route, navigation}) {
         createdAt: new Date(),
         user: {
           _id: 1,
-        },
-      },
-      {
-        _id: 1,
-        text: 'Hello developer',
-        createdAt: new Date(),
-        user: {
-          _id: 2,
-          name: 'SnapBird',
-          avatar: require('../assets/images/snapbird.png'),
         },
       },
     ];
@@ -270,10 +261,13 @@ export default function Chat({route, navigation}) {
       case 'bmp':
       case 'svg':
         return 'Image';
+      case 'string':
+        return 'string';
       default:
         return 'Unknown File Type';
     }
   }
+
   function goFileView(res, name) {
     navigation.navigate('FileView', {
       base64String: res,
@@ -285,7 +279,6 @@ export default function Chat({route, navigation}) {
       uri: picuri,
     });
   }
-
   return (
     <View style={styles.container}>
       {/* 顶部空白条 */}
@@ -366,7 +359,16 @@ export default function Chat({route, navigation}) {
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                   {fileOutcome.map((outcome, index) => {
                     console.log(outcome.file_name);
-                    if (getFileType(outcome.file_name) == 'PDF Document') {
+                    if (getFileType(outcome.file_name) == 'string') {
+                      return (
+                        <TextBox
+                          key={outcome.file_name}
+                          textValue={outcome.res.join('\n')}
+                        />
+                      );
+                    } else if (
+                      getFileType(outcome.file_name) == 'PDF Document'
+                    ) {
                       return (
                         <FileShow.PdfShow
                           key={outcome.file_name}
@@ -552,5 +554,18 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 0,
     bottom: 0,
+  },
+  textBox: {
+    borderWidth: 2,
+    backgroundColor: '#444444',
+    borderRadius: 15,
+    borderColor: '#999999',
+    color: 'white',
+  },
+  textBoxContainer: {
+    height: 150,
+    width: 200,
+    margin: 7,
+    marginRight: 35,
   },
 });

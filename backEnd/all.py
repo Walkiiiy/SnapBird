@@ -246,3 +246,31 @@ class CommonOcr(object):
         except Exception as e:
             print(e)
             return 0
+
+    def content_extract(self, keys):
+        # 通用NLP信息抽取
+        url = 'https://api.textin.com/ai/service/v1/contents-extract'
+        head = {}
+        try:
+            # image = get_file_content(self._img_path)
+            head['x-ti-app-id'] = self._app_id
+            head['x-ti-secret-code'] = self._secret_code
+
+            type = "image"  # image 类型
+            image = get_file_content(self._img_path)
+            image_base64 = base64.b64encode(image).decode()  # 将图像数据转为base64编码
+            request_body = json.dumps(
+                {"keys": keys, "file": image_base64, "type": type})  # 构造请求体
+            result = requests.post(url, data=request_body, headers=head)
+
+            result = (json.loads(result.text).get(
+                'result', {}).get('item_list', {}))
+            res = []
+            for item in result:
+                candidates = item['candidates']
+                for item in candidates:
+                    res.append(res['value'])
+            return res
+        except Exception as e:
+            print(e)
+            return 0

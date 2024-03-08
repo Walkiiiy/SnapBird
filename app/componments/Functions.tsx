@@ -25,6 +25,8 @@ const options = [
   {id: '11', label: 'pdf转excel', intro: 'pdf->excel'},
   {id: '12', label: 'pdf转word', intro: 'pdf->word'},
   {id: '13', label: '图片转word', intro: '图像->word'},
+  {id: '14', label: '图像文字信息提取', intro: '图像->文本'},
+  {id: '15', label: '文件重命名', intro: '任意格式'},
 ];
 
 export default function ScrollableButtonSelector({handleSelect}) {

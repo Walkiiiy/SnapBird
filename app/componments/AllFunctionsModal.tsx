@@ -13,6 +13,7 @@ const imageFunctions = [
   {id: '2', label: '图像切边增强', intro: '图像->图像'},
   {id: '3', label: '通用表格识别', intro: '图像->excel'},
   {id: '4', label: '图像水印去除', intro: '图像->图像'},
+  {id: '5', label: '图像文字信息提取', intro: '图像->文本'},
 ];
 const typeTransformFunctions = [
   {id: '1', label: 'word转图片', intro: 'word->图像'},
@@ -25,6 +26,7 @@ const typeTransformFunctions = [
   {id: '8', label: 'pdf转word', intro: 'pdf->word'},
   {id: '9', label: '图片转word', intro: '图像->word'},
 ];
+const otherFunctions = [{id: '1', label: '文件重命名', intro: '任意格式'}];
 function CustomModal({handleSelect, visible, onClose}) {
   // 渲染单个功能按钮
   const renderFunctionButton = (option, index) => (
@@ -56,6 +58,10 @@ function CustomModal({handleSelect, visible, onClose}) {
             <Text style={styles.modalContent}>格式转换</Text>
             <View style={styles.functionContainer}>
               {typeTransformFunctions.map(renderFunctionButton)}
+            </View>
+            <Text style={styles.modalContent}>其他</Text>
+            <View style={styles.functionContainer}>
+              {otherFunctions.map(renderFunctionButton)}
             </View>
           </ScrollView>
 

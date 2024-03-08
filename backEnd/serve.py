@@ -51,12 +51,19 @@ def clearDir(directory):  # 清空文件夹
 
 
 def handleMutipleOperation(operations):  # 按需调用api，返回文件base64列表
+    textRes = []
+    textFileNames = []
     while operations:  # 将返回的结果提取并存储，改变res路径
         opt = operations.pop(0)
         if opt == '1':  # 模型调用ocr还没想好怎么写，而且目前代码不支持并行操作请求，即每次只能完成一个请求
             try:
+                print('modal is calling opt1')
                 result = recognize()
+                clearDir(modelTempPath)
                 result = result.json['results']
+                for item in result:
+                    textFileNames.append(item['file_name'])
+                    textRes.append('\n'.join(item['res']))
             except Exception as e:
                 print(e)
         elif opt == '2':
@@ -242,6 +249,20 @@ def handleMutipleOperation(operations):  # 按需调用api，返回文件base64�
                         file.write(file_data)
             except Exception as e:
                 print(e)
+        elif opt == '15':
+            try:
+                print('modal is calling opt15')
+                result = contentsExtract(['重要特性'])
+                clearDir(modelTempPath)
+                result = result.json['results']
+                for item in result:
+                    fileName = item['file_name']
+                    file_path = os.path.join(modelTempPath, fileName)
+                    file_data = base64.b64decode(item['res'])
+                    with open(file_path, 'wb') as file:
+                        file.write(file_data)
+            except Exception as e:
+                print(e)
         # 不要忘了最后清理modelTemp文件夹
     results = []
     filenames = os.listdir(modelTempPath)
@@ -249,9 +270,15 @@ def handleMutipleOperation(operations):  # 按需调用api，返回文件base64�
         with open(os.path.join(modelTempPath, filename), 'rb') as file:
             file_content = file.read()
         file_content = base64.b64encode(file_content).decode('utf-8')
+        print(file_content)
         results.append({
             'file_name': str(random.randint(100, 999))+filename,
             'res': file_content
+        })
+    for index, textcontent in enumerate(textRes):
+        results.append({
+            'file_name': str(random.randint(100, 999))+textFileNames[index],
+            'res': textcontent
         })
     clearDir(modelTempPath)
     return results
@@ -373,8 +400,8 @@ def recognize():
             texts = common_ocr.recognize()
             if texts:
                 results.append({
-                    'file_name': str(random.randint(100, 999))+filename,
-                    'texts': texts
+                    'file_name': str(random.randint(100, 999))+filename+'.string',
+                    'res': texts
                 })
             else:
                 print('something went wrong with main/recognize.')
@@ -384,6 +411,7 @@ def recognize():
                 'file_name': filename,
                 'error': str(e)
             })
+    print(results)
     return jsonify({
         'message': 'Files processed successfully',
         'results': results
@@ -879,6 +907,41 @@ def merge_pdfs(output_filename="merged_output.pdf"):
         'res': file_content
     })
     os.remove(os.path.join(directory_path, output_filename))
+    return jsonify({
+        'message': 'Files processed successfully',
+        'results': results
+    })
+
+
+def contentsExtract(keys):
+    results = []
+    try:
+        files = os.listdir(modelTempPath)
+        if not files:
+            files = os.listdir(picPath)  # 列出目录下所有文件
+            dirpath = picPath
+        else:
+            dirpath = modelTempPath
+    except Exception as e:
+        return jsonify({'message': 'Error listing input directory', 'error': str(e)})
+    for i, filename in enumerate(files):
+        file_path = os.path.join(dirpath, filename)
+        try:
+            common_ocr = CommonOcr(file_path)
+            res = common_ocr.content_extract(keys)
+            if res:
+                results.append({
+                    'file_name': str(random.randint(100, 999))+filename+'.string',
+                    'res': res,
+                })
+            else:
+                print('something went wrong with all/content-extract.')
+        except Exception as e:
+            print(f"Error processing file {filename}: {e}")
+            results.append({
+                'file_name': str(random.randint(100, 999))+filename,
+                'error': str(e)
+            })
     return jsonify({
         'message': 'Files processed successfully',
         'results': results

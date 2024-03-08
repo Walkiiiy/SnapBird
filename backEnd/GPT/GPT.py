@@ -3,14 +3,12 @@ from GPT.key import getKey
 # 文件栏是否为空在给出完整步骤后由后端执行
 # 格式正确性判断在给出完整步骤后由后端执行
 # 无上下文
-client = OpenAI(
-    # This is the default and can be omitted
-    api_key=getKey(),
-)
+api_base = "https://pro.aiskt.com/v1"
+client = OpenAI(api_key=getKey(), base_url=api_base)
 
 
 def askChatGPT(messages):
-    MODEL = "gpt-3.5-turbo"
+    MODEL = "gpt-4-1106-preview"
     chat_completion = client.chat.completions.create(
         model=MODEL,
         messages=messages,

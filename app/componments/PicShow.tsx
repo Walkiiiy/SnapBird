@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, Image, TouchableOpacity, StyleSheet, Text} from 'react-native';
-const SquareImageWithCloseButton = ({imageUrl, onClose, onView}) => {
+const WithCloseButton = ({imageUrl, onClose, onView}) => {
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={onView}>
@@ -40,4 +40,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SquareImageWithCloseButton;
+export default WithCloseButton;
