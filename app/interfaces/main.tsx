@@ -17,7 +17,54 @@ export async function ocrInterface() {
     console.log(error);
   }
 }
-
+export async function billRecognizeInterface() {
+  console.log('main:billRec');
+  const Url = url + 'bills_recognize';
+  try {
+    // 发送GET请求到指定的URL
+    const response = await axios.get(Url);
+    if (response.data.message == 'Files processed successfully') {
+      console.log(response.data.results);
+      return response.data.results; //例：{"file_name": "1000000049.png", "texts": ["中国原指华夏族的发源地
+    } else {
+      return 'server returned a bad signal!';
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+export async function businessLicense() {
+  console.log('main:businessLicense');
+  const Url = url + 'business_license';
+  try {
+    // 发送GET请求到指定的URL
+    const response = await axios.get(Url);
+    if (response.data.message == 'Files processed successfully') {
+      console.log(response.data.results);
+      return response.data.results; //例：{"file_name": "1000000049.png", "texts": ["中国原指华夏族的发源地
+    } else {
+      return 'server returned a bad signal!';
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+export async function idCard() {
+  console.log('main:idCard');
+  const Url = url + 'id_card';
+  try {
+    // 发送GET请求到指定的URL
+    const response = await axios.get(Url);
+    if (response.data.message == 'Files processed successfully') {
+      console.log(response.data.results);
+      return response.data.results; //例：{"file_name": "1000000049.png", "texts": ["中国原指华夏族的发源地
+    } else {
+      return 'server returned a bad signal!';
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
 export async function tableInterface() {
   console.log('main:table recognize');
   const Url = url + 'tableRecognize';

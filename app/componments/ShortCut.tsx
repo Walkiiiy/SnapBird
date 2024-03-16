@@ -5,6 +5,7 @@ import {
   Text,
   StyleSheet,
   View,
+  Image,
 } from 'react-native';
 
 type ButtonOption = {
@@ -32,7 +33,21 @@ export default function ScrollableButtonSelector({handleSelect}) {
           style={styles.button}
           onPress={() => handleSelect(option.label)}>
           <Text style={styles.buttonText}>{option.label}</Text>
-          <Text style={[styles.buttonText, {color: 'grey'}]}>icon</Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              top: 10,
+            }}>
+            <Text style={{bottom: 3, color: '#aaaaaa', fontSize: 13}}>
+              一键生成
+            </Text>
+            <Image
+              source={require('../assets/icons/double-right-gray.png')} // 图片路径
+              style={{width: 20, height: 20}}
+            />
+          </View>
         </TouchableOpacity>
       ))}
     </ScrollView>
@@ -44,12 +59,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   button: {
-    width: 300,
+    width: 280,
     height: 100,
     margin: 5,
     paddingVertical: 8,
     paddingHorizontal: 16,
-    backgroundColor: '#444444',
+    backgroundColor: '#333333',
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
@@ -63,7 +78,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: 17,
     color: 'white',
   },
 });

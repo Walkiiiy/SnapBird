@@ -50,6 +50,9 @@ import {
   pdfToExcel,
   pdfToWord,
   imgToWord,
+  billRecognizeInterface,
+  businessLicense,
+  idCard,
 } from '../interfaces/main';
 
 export default function HomeScreen({navigation}) {
@@ -68,6 +71,7 @@ export default function HomeScreen({navigation}) {
   const [keyboardShown, setKeyboardShown] = React.useState(false);
   const [title1, setTitle1] = React.useState('快速开始');
   const [title2, setTitle2] = React.useState('ShortCut');
+  const [shortCutIntroVisible, setShortCutIntroVisible] = React.useState(false);
   const [showActivativeIndicator, setShowActivativeIndicator] =
     React.useState(false);
   //键盘事件监听
@@ -162,6 +166,7 @@ export default function HomeScreen({navigation}) {
     setAllFunctionsVisible(false);
     if (fileUpload.length == 0) {
       setTitle1('请先上传图片或文件！！');
+      setUploadMenuVisible(!uploadMenuVisible);
       await wait(1500);
       setTitle1('快速开始');
     } else {
@@ -209,10 +214,15 @@ export default function HomeScreen({navigation}) {
         setTitle1('请使用ai助手调用此功能');
         await wait(3000);
         setTitle1('快速开始');
-      } else if (option == '文件重命名') {
-        setTitle1('请使用ai助手调用此功能');
-        await wait(3000);
-        setTitle1('快速开始');
+      } else if (option == '通用票据识别') {
+        const res = await billRecognizeInterface();
+        setFileOutcome(fileOutcome => fileOutcome.concat(res));
+      } else if (option == '营业执照识别') {
+        const res = await businessLicense();
+        setFileOutcome(fileOutcome => fileOutcome.concat(res));
+      } else if (option == '身份证识别') {
+        const res = await idCard();
+        setFileOutcome(fileOutcome => fileOutcome.concat(res));
       } else {
         console.log('unknown function');
       }
@@ -365,6 +375,12 @@ export default function HomeScreen({navigation}) {
         content="这是一个demo app，为了展示项目的概念设计，只有部分后端功能实现。"
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
+      />
+      <Notice
+        title="关于'ShortCut捷径'"
+        content="ShortCut捷径能记录你对SnapBird的复杂指令，当你需要再次调用相同功能时，不用再向AI助手描述你的需求，上传图片后直接点击就能得到结果。"
+        visible={shortCutIntroVisible}
+        onClose={() => setShortCutIntroVisible(false)}
       />
       <AllFunctionsModal
         handleSelect={quickStart}
@@ -582,6 +598,11 @@ export default function HomeScreen({navigation}) {
         <View style={styles.shortCutArea}>
           <View style={styles.functionTitleArea}>
             <Text style={styles.functionTitle}>{title2}</Text>
+            <ShowMoreButton
+              onPress={() => {
+                setShortCutIntroVisible(true);
+              }}
+            />
           </View>
           <View style={styles.selectionArea}>
             <ShortCut handleSelect={shortCut} />
@@ -612,7 +633,7 @@ export default function HomeScreen({navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#333333', // 设置颜色以便于区分
+    backgroundColor: '#222222', // 设置颜色以便于区分
   },
   title: {
     color: 'white',
@@ -638,8 +659,8 @@ const styles = StyleSheet.create({
     flex: 1.5, // flex: 1 表示这部分也会占据可用空间的一半
   },
   roundImage: {
-    width: 100, // 图像宽度
-    height: 100, // 图像高度
+    width: 95, // 图像宽度
+    height: 95, // 图像高度
     borderRadius: 50, // 将 borderRadius 设置为宽度和高度的一半可以创建圆形效果
     // 如果你的图像不是正方形，请确保 width 和 height 相等，并将 borderRadius 设置为这两个值的一半
     resizeMode: 'cover', // 覆盖整个图像框
@@ -650,7 +671,7 @@ const styles = StyleSheet.create({
     margin: 10,
     borderWidth: 2,
     padding: 10,
-    backgroundColor: '#444444',
+    backgroundColor: '#333333',
     borderRadius: 15,
     borderColor: '#999999',
     color: 'white',
@@ -658,7 +679,7 @@ const styles = StyleSheet.create({
   functionTitle: {
     color: 'white',
     fontSize: 18,
-    fontWeight: '300',
+    fontWeight: '500',
     left: 15,
   },
   humburger: {

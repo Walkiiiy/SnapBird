@@ -945,5 +945,119 @@ def contentsExtract(keys):
     })
 
 
+@app.route('/bills_recognize', methods=['GET'])  # 通用票据识别image->文本
+def bills_recognize():
+    try:
+        files = os.listdir(modelTempPath)
+        if not files:
+            files = os.listdir(picPath)
+            dirpath = picPath
+        else:
+            dirpath = modelTempPath
+    except Exception as e:
+        return jsonify({'message': 'Error listing input directory', 'error': str(e)})
+
+    results = []
+
+    for i, filename in enumerate(files):
+        file_path = os.path.join(dirpath, filename)
+        try:
+            common_ocr = CommonOcr(file_path)
+            texts = common_ocr.bills_recognize()
+            if texts:
+                results.append({
+                    'file_name': str(random.randint(100, 999))+filename+'.string',
+                    'res': [texts]
+                })
+            else:
+                print('something went wrong with main/bill_recognize.')
+        except Exception as e:
+            print(f"Error processing file {filename}: {e}")
+            results.append({
+                'file_name': filename,
+                'error': str(e)
+            })
+    return jsonify({
+        'message': 'Files processed successfully',
+        'results': results
+    })
+
+
+@app.route('/business_license', methods=['GET'])  # 通用票据识别image->文本
+def business_license():
+    try:
+        files = os.listdir(modelTempPath)
+        if not files:
+            files = os.listdir(picPath)
+            dirpath = picPath
+        else:
+            dirpath = modelTempPath
+    except Exception as e:
+        return jsonify({'message': 'Error listing input directory', 'error': str(e)})
+
+    results = []
+
+    for i, filename in enumerate(files):
+        file_path = os.path.join(dirpath, filename)
+        try:
+            common_ocr = CommonOcr(file_path)
+            texts = common_ocr.business_license()
+            if texts:
+                results.append({
+                    'file_name': str(random.randint(100, 999))+filename+'.string',
+                    'res': [texts]
+                })
+            else:
+                print('something went wrong with main/businessLicense_recognize.')
+        except Exception as e:
+            print(f"Error processing file {filename}: {e}")
+            results.append({
+                'file_name': filename,
+                'error': str(e)
+            })
+    return jsonify({
+        'message': 'Files processed successfully',
+        'results': results
+    })
+
+
+@app.route('/id_card', methods=['GET'])  # 通用票据识别image->文本
+def id_card():
+    try:
+        files = os.listdir(modelTempPath)
+        if not files:
+            files = os.listdir(picPath)
+            dirpath = picPath
+        else:
+            dirpath = modelTempPath
+    except Exception as e:
+        return jsonify({'message': 'Error listing input directory', 'error': str(e)})
+
+    results = []
+
+    for i, filename in enumerate(files):
+        file_path = os.path.join(dirpath, filename)
+        try:
+            common_ocr = CommonOcr(file_path)
+            texts = common_ocr.idCard()
+            if texts:
+                results.append({
+                    'file_name': str(random.randint(100, 999))+filename+'.string',
+                    'res': [texts]
+                })
+            else:
+                print('something went wrong with main/idCard_recognize.')
+        except Exception as e:
+            print(f"Error processing file {filename}: {e}")
+            results.append({
+                'file_name': filename,
+                'error': str(e)
+            })
+    return jsonify({
+        'message': 'Files processed successfully',
+        'results': results
+    })
+
+
 if __name__ == '__main__':
     app.run(port=5000, debug=True)

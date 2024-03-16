@@ -6,6 +6,7 @@ import {
   Text,
   StyleSheet,
   Keyboard,
+  Image,
 } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 
@@ -24,7 +25,13 @@ const ReadOnlyTextInputWithCopy = ({textValue}) => {
         scrollEnabled={true}
       />
       <TouchableOpacity style={styles.button} onPress={copyToClipboard}>
-        <Text style={styles.buttonText}>copy</Text>
+        <Image
+          source={require('../assets/icons/copy.png')}
+          style={{
+            width: 14,
+            height: 14,
+          }}
+        />
       </TouchableOpacity>
     </View>
   );
@@ -36,7 +43,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 10,
-    backgroundColor: '#333', // 暗背景色
+    backgroundColor: '#222222', // 暗背景色
     position: 'relative',
   },
   textInput: {
@@ -56,12 +63,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#333333', // 按钮的深色背景
     width: 40,
     height: 20,
-  },
-  buttonText: {
-    color: '#fff', // 按钮文字颜色为白色
-    textAlign: 'center', // 文字居中
-    fontWeight: 'bold', // 字体加粗
-    fontSize: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

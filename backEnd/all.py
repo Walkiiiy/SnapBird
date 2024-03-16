@@ -15,6 +15,95 @@ def get_file_base64(filePath):
     return base64.b64encode(image_content).decode('utf-8')
 
 
+def format_bills_rec_response(response):
+    try:
+        response = eval(response)
+    except (SyntaxError, ValueError):
+        return "输入的响应文本格式不正确。"
+
+    # 确保输入是一个字典并且包含需要的键
+    if not isinstance(response, dict) or 'result' not in response or 'object_list' not in response['result']:
+        return "输入的响应格式不正确或缺少必要的信息。"
+
+    # 初始化结果字符串
+    result_str = ""
+
+    # 遍历所有票据对象
+    for obj in response['result']['object_list']:
+        type_description = "票据类型描述：" + obj.get('type_description', '未知')
+        kind_description = "票据使用类型描述：" + obj.get('kind_description', '未知')
+        item_descriptions = []
+
+        # 遍历所有识别项
+        for item in obj.get('item_list', []):
+            key_description = item.get('description', '未知字段')
+            value = item.get('value', '')
+            item_descriptions.append(f"{key_description}：{value}")
+
+        # 将票据的描述加入结果字符串
+        result_str += f"{type_description}，{kind_description}，" + \
+            "，".join(item_descriptions) + "。\n"
+
+    return result_str
+
+
+def format_business_license_response(response):
+    try:
+        response = eval(response)
+    except (SyntaxError, ValueError):
+        return "输入的响应文本格式不正确。"
+    # 确保输入是一个字典并且包含需要的键
+    if not isinstance(response, dict) or 'result' not in response or 'item_list' not in response['result']:
+        return "输入的响应格式不正确或缺少必要的信息。"
+
+    # 初始化结果字符串
+    result_str = "营业执照识别结果：\n"
+
+    # 遍历识别结果中的每一个项
+    for item in response['result']['item_list']:
+        # 获取字段的中文描述和对应的值
+        description = item.get('description', '未知字段')
+        value = item.get('value', '')
+
+        # 将字段描述和值加入到结果字符串中
+        result_str += f"{description}：{value}\n"
+
+    return result_str
+
+
+def format_id_card_response(response):
+    try:
+        response = eval(response)
+    except (SyntaxError, ValueError):
+        return "输入的响应文本格式不正确。"
+    # 检查是否为有效的响应格式
+    if not isinstance(response, dict) or 'result' not in response or 'item_list' not in response['result']:
+        return "输入的响应格式不正确或缺少必要的信息。"
+
+    # 初始化结果字符串
+    result_str = "身份证识别结果：\n"
+
+    # 排除的字段列表
+    exclude_keys = ['id_number_image', 'crop_image', 'head_portrait']
+
+    # 遍历识别结果中的每一个项
+    for item in response['result']['item_list']:
+        key = item.get('key', '')
+
+        # 如果当前字段在排除列表中，则跳过
+        if key in exclude_keys:
+            continue
+
+        # 获取字段的中文描述和对应的值
+        description = item.get('description', '未知字段')
+        value = item.get('value', '')
+
+        # 将字段描述和值加入到结果字符串中
+        result_str += f"{description}：{value}\n"
+
+    return result_str
+
+
 class CommonOcr(object):
     def __init__(self, img_path):
         # 请登录后前往 “工作台-账号设置-开发者信息” 查看 x-ti-app-id
@@ -272,6 +361,52 @@ class CommonOcr(object):
                 for it in candidates:
                     res.append(it['value']+'\n')
             return res
+        except Exception as e:
+            print(e)
+            return 0
+
+    def bills_recognize(self):
+        # 国内通用票据识别
+        url = 'https://api.textin.com/robot/v1.0/api/bills_crop'
+        head = {}
+        try:
+            image = get_file_content(self._img_path)
+            head['x-ti-app-id'] = self._app_id
+            head['x-ti-secret-code'] = self._secret_code
+            result = requests.post(url, data=image, headers=head)
+            result = format_bills_rec_response(result.text)
+            return result
+        except Exception as e:
+            print(e)
+            return 0
+
+    def business_license(self):
+        # 营业执照识别
+        url = 'https://api.textin.com/robot/v1.0/api/business_license'
+        head = {}
+        try:
+            image = get_file_content(self._img_path)
+            head['x-ti-app-id'] = self._app_id
+            head['x-ti-secret-code'] = self._secret_code
+            result = requests.post(url, data=image, headers=head)
+            result = format_business_license_response(result.text)
+            return result
+        except Exception as e:
+            print(e)
+            return 0
+
+    def idCard(self):
+        # 身份证识别
+        url = 'https://api.textin.com/robot/v1.0/api/id_card'
+        head = {}
+        try:
+            image = get_file_content(self._img_path)
+            head['x-ti-app-id'] = self._app_id
+            head['x-ti-secret-code'] = self._secret_code
+            result = requests.post(url, data=image, headers=head)
+            result = format_id_card_response(result.text)
+            print(result)
+            return result
         except Exception as e:
             print(e)
             return 0

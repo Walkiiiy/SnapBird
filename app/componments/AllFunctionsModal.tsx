@@ -9,11 +9,47 @@ import {
 } from 'react-native';
 
 const imageFunctions = [
-  {id: '1', label: '通用文字识别', intro: '图像->文本'},
-  {id: '2', label: '图像切边增强', intro: '图像->图像'},
-  {id: '3', label: '通用表格识别', intro: '图像->excel'},
-  {id: '4', label: '图像水印去除', intro: '图像->图像'},
-  {id: '5', label: '图像文字信息提取', intro: '图像->文本'},
+  {
+    id: '1',
+    label: '通用文字识别',
+    intro: '对图像中的文字进行快速、精准的检测和识别，返回可一键复制的文本内容',
+  },
+  {
+    id: '2',
+    label: '图像切边增强',
+    intro:
+      '智能判断照片中主体文档的边缘进行切边，同时增强图像突出文字，返回切边后的图像。',
+  },
+  {
+    id: '3',
+    label: '通用表格识别',
+    intro:
+      '识别图片中的表格内容，包括有线表格、无线表格、合并单元格表格，返回excel表格',
+  },
+  {
+    id: '4',
+    label: '图像水印去除',
+    intro:
+      '支持对图片中日期、logo、文字等形式的水印进行自动擦除,返回处理后的图片。',
+  },
+  {
+    id: '5',
+    label: '通用票据识别',
+    intro:
+      '可对通用机打发票、通用定额发票、公路客运发票、火车票等各类发票进行识别，返回识别字段文本信息。',
+  },
+  {
+    id: '6',
+    label: '营业执照识别',
+    intro:
+      '快速精准结构化识别企业营业执照（各类版式，支持新旧版本）中的注册号、公司名称、地址、主体类型、法定代表人等14个关键有效字段',
+  },
+  {
+    id: '7',
+    label: '身份证识别',
+    intro:
+      '对身份证正反面的全部字段进行结构化识别，包括姓名、性别、民族、出生日期、地址、身份证号、有效期限、签发机关',
+  },
 ];
 const typeTransformFunctions = [
   {id: '1', label: 'word转图片', intro: 'word->图像'},
@@ -36,8 +72,17 @@ function CustomModal({handleSelect, visible, onClose}) {
       onPress={() => {
         handleSelect(option.label); // 确保handleSelect函数在组件中被定义
       }}>
-      <Text style={styles.buttonText}>{option.label}</Text>
-      <Text style={[styles.buttonText, {color: 'grey'}]}>{option.intro}</Text>
+      <Text
+        style={[styles.buttonText, {color: 'white', fontSize: 15, margin: 5}]}>
+        {option.label}
+      </Text>
+      <Text
+        style={[
+          styles.buttonText,
+          {color: '#faf0e6', fontSize: 11, marginLeft: 20, marginRight: 20},
+        ]}>
+        {option.intro}
+      </Text>
     </TouchableOpacity>
   );
 
@@ -100,13 +145,14 @@ const styles = StyleSheet.create({
     color: 'white',
     marginBottom: 15,
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: 19,
   },
   closeButton: {
     borderRadius: 20,
     padding: 10,
     elevation: 2,
     backgroundColor: '#2196F3',
+    top: 7,
   },
   buttonText: {
     color: 'white',
@@ -117,10 +163,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   button: {
-    width: '30%',
-    height: 95,
+    width: '100%',
+    height: 100,
     margin: 5,
-    backgroundColor: '#444444',
+    marginTop: 17,
+    backgroundColor: '#517a7b',
     borderRadius: 20,
     marginVertical: 5, // 调整垂直边距，确保纵向间隔
     paddingVertical: 8,
