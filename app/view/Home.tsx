@@ -26,6 +26,7 @@ import * as FileShow from '../componments/FileShow';
 import ShowMoreButton from '../componments/ShowMoreButton';
 import AllFunctionsModal from '../componments/AllFunctionsModal';
 import TextBox from '../componments/TextBox';
+import Bubble from '../componments/Bubble';
 
 import {
   UserContext,
@@ -53,6 +54,7 @@ import {
   billRecognizeInterface,
   businessLicense,
   idCard,
+  typeQuery,
 } from '../interfaces/main';
 
 export default function HomeScreen({navigation}) {
@@ -72,6 +74,8 @@ export default function HomeScreen({navigation}) {
   const [title1, setTitle1] = React.useState('快速开始');
   const [title2, setTitle2] = React.useState('ShortCut');
   const [shortCutIntroVisible, setShortCutIntroVisible] = React.useState(false);
+  const [showPrompt, setShowPrompt] = React.useState(false);
+  const [prompt, setPrompt] = React.useState('');
   const [showActivativeIndicator, setShowActivativeIndicator] =
     React.useState(false);
   //键盘事件监听
@@ -162,6 +166,7 @@ export default function HomeScreen({navigation}) {
   }
   //处理快速开始选择
   async function quickStart(option: string) {
+    setShowPrompt(false);
     console.log(`Selected option: ${option}`);
     setAllFunctionsVisible(false);
     if (fileUpload.length == 0) {
@@ -229,7 +234,6 @@ export default function HomeScreen({navigation}) {
       setShowActivativeIndicator(false);
     }
   }
-
   //发送消息，转ai界面
   function sendMessage() {
     console.log('sendMessage');
@@ -283,6 +287,20 @@ export default function HomeScreen({navigation}) {
     });
   }
 
+  async function promptMessageSet(type) {
+    if (type == 'Image') {
+      let typeRes = await typeQuery();
+      typeRes = typeRes[0].res[0];
+      setPrompt(typeRes);
+    } else if (type == 'Excel Spreadsheet') {
+    } else if (type == 'Word Document') {
+    } else if (type == 'PDF Document') {
+    } else if (type == 'PowerPoint Presentation') {
+    }
+    //添加其他情况
+    setShowPrompt(true);
+  }
+
   function uploadImg() {
     const options = {
       noData: true,
@@ -298,6 +316,7 @@ export default function HomeScreen({navigation}) {
           );
           setFileUpload(fileUpload => fileUpload.concat([asset.uri]));
         }
+        promptMessageSet('Image');
         console.log(fileUpload);
         setShowActivativeIndicator(false);
         setPicVisible(true);
@@ -310,10 +329,23 @@ export default function HomeScreen({navigation}) {
       saveToPhotos: true,
       mediaType: 'photo',
     };
-    launchCamera(options, response => {
+    launchCamera(options, async response => {
       console.log(response);
       if (response.assets && response.assets.length > 0) {
-        setFileUpload(response.assets[0].uri);
+        if (!response.didCancel) {
+          setShowActivativeIndicator(true);
+          for (const asset of response.assets) {
+            await uploadFile(asset.uri, asset.fileName);
+            setFileType(fileType =>
+              fileType.concat([getFileType(asset.fileName)]),
+            );
+            setFileUpload(fileUpload => fileUpload.concat([asset.uri]));
+          }
+          promptMessageSet('Image');
+          console.log(fileUpload);
+          setShowActivativeIndicator(false);
+          setPicVisible(true);
+        }
       }
     });
   }
@@ -343,6 +375,7 @@ export default function HomeScreen({navigation}) {
         setFileType(fileType => fileType.concat([getFileType(res[i].name)]));
         setFileUpload(fileUpload => fileUpload.concat([res[i].uri]));
       }
+      promptMessageSet(getFileType(res[0].name));
       setShowActivativeIndicator(false);
       setPicVisible(true);
     } catch (err) {
@@ -480,7 +513,11 @@ export default function HomeScreen({navigation}) {
               }
             })}
           </ScrollView>
-          {
+          {showPrompt ? (
+            <ScrollView style={{maxHeight: '50%'}}>
+              <Bubble text={prompt} isSender={false} />
+            </ScrollView>
+          ) : (
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {fileOutcome.map((outcome, index) => {
                 if (getFileType(outcome.file_name) == 'string') {
@@ -552,7 +589,7 @@ export default function HomeScreen({navigation}) {
                 }
               })}
             </ScrollView>
-          }
+          )}
           <View style={styles.activityIndicatorContainer}>
             {showActivativeIndicator ? (
               <ActivityIndicator

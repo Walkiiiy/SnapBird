@@ -29,6 +29,11 @@ print('current fileName:', fileNames)
 print('current fileType:', fileTypes)
 
 
+def get_pic_Type():  # 模型获取图片内容
+
+    return 'idCard'
+
+
 def get_files_base64_andRemove(directory):  # 从zip提取文件，转base64，并删除源文件
     base64_files = []
     for root, dirs, files in os.walk(directory):
@@ -1053,6 +1058,43 @@ def id_card():
                 'file_name': filename,
                 'error': str(e)
             })
+    return jsonify({
+        'message': 'Files processed successfully',
+        'results': results
+    })
+
+
+@app.route('/type_query', methods=['GET'])  # 通用票据识别image->文本
+def type_query():
+    try:
+        files = os.listdir(modelTempPath)
+        if not files:
+            files = os.listdir(picPath)
+            dirpath = picPath
+        else:
+            dirpath = modelTempPath
+    except Exception as e:
+        return jsonify({'message': 'Error listing input directory', 'error': str(e)})
+
+    results = []
+
+    file_path = os.path.join(dirpath, files[0])
+    try:
+        texts = get_pic_Type()
+        if texts:
+            results.append({
+                'file_name': str(random.randint(100, 999))+files[0],
+                'res': [texts]
+            })
+        else:
+            print('something went wrong with main/type_query.')
+    except Exception as e:
+        print(f"Error processing file {files[0]}: {e}")
+        results.append({
+            'file_name': files[0],
+            'error': str(e)
+        })
+    print(results)
     return jsonify({
         'message': 'Files processed successfully',
         'results': results

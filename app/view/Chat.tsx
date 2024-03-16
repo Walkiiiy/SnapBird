@@ -3,7 +3,6 @@ import {
   GiftedChat,
   Bubble,
   InputToolbar,
-  Send,
   Composer,
 } from 'react-native-gifted-chat';
 import {launchImageLibrary, launchCamera} from 'react-native-image-picker';

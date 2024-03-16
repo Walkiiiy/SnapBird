@@ -368,6 +368,18 @@ export async function sendUserExit() {
     console.log(error);
   }
 }
+
+export async function typeQuery() {
+  const Url = url + 'type_query';
+  try {
+    const response = await axios.get(Url);
+    console.log('main:', response.data.results);
+    return response.data.results;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 function getFileExtension(filePath) {
   // 按点分割字符串，然后取最后一个元素作为扩展名
   const parts = filePath.split('.');
