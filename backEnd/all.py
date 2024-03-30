@@ -410,3 +410,35 @@ class CommonOcr(object):
         except Exception as e:
             print(e)
             return 0
+
+    def bankCard(self):
+        # 银行卡识别
+        url = 'https://api.textin.com/robot/v1.0/api/bank_card'
+        head = {}
+        try:
+            image = get_file_content(self._img_path)
+            head['x-ti-app-id'] = self._app_id
+            head['x-ti-secret-code'] = self._secret_code
+            result = requests.post(url, data=image, headers=head)
+            result = format_id_card_response(result.text)
+            print(result)
+            return result
+        except Exception as e:
+            print(e)
+            return 0
+
+    def driverLicense(self):
+        # 银行卡识别
+        url = 'https://api.textin.com/robot/v1.0/api/driver_license'
+        head = {}
+        try:
+            image = get_file_content(self._img_path)
+            head['x-ti-app-id'] = self._app_id
+            head['x-ti-secret-code'] = self._secret_code
+            result = requests.post(url, data=image, headers=head)
+            result = format_id_card_response(result.text)
+            print(result)
+            return result
+        except Exception as e:
+            print(e)
+            return 0

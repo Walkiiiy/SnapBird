@@ -17,7 +17,7 @@ import {sendUserExit} from './interfaces/main';
 const Stack = createNativeStackNavigator();
 
 function App() {
-  const [user, setUser] = React.useState(null);
+  const [user, setUser] = React.useState('未登录');
   const [fileOutcome, setFileOutcome] = React.useState([]);
   const [fileUpload, setFileUpload] = React.useState([]);
   const [fileType, setFileType] = React.useState([]);
@@ -85,7 +85,11 @@ function App() {
                 <Stack.Screen
                   name="Me"
                   component={MeScreen}
-                  options={{headerShown: false}}
+                  options={{
+                    headerTitle: '',
+                    headerTransparent: true,
+                    headerTintColor: 'white',
+                  }}
                 />
               </Stack.Navigator>
             </NavigationContainer>

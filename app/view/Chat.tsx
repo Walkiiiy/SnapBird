@@ -504,7 +504,7 @@ export default function Chat({route, navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#333333',
+    backgroundColor: '#222222',
   },
   activityIndicatorContainer: {
     flex: 0.6,

@@ -12,9 +12,9 @@ import {
 
 const {width, height} = Dimensions.get('window');
 
-const menuItems = ['账户', 'AI助手', '历史记录', '设置']; // 示例菜单项
+const menuItems = ['登录/注册', 'AI助手', '关于']; // 示例菜单项
 
-function RightSideMenu({visible, onClose, onChoose}) {
+function RightSideMenu({visible, onClose, onChoose, userName}) {
   return (
     <Modal
       animationType="fade"
@@ -34,7 +34,7 @@ function RightSideMenu({visible, onClose, onChoose}) {
                 source={require('../assets/icons/black_me.png')}
               />
             </View>
-            <Text style={{color: 'white', fontSize: 18}}>{'未登录'}</Text>
+            <Text style={{color: 'white', fontSize: 18}}>{userName}</Text>
           </View>
           {menuItems.map((item, index) => (
             <TouchableOpacity

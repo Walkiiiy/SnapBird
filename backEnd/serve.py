@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 from all import CommonOcr
 import time
@@ -9,14 +9,29 @@ import zipfile
 import base64
 import io
 from PyPDF2 import PdfMerger
-from docx import Document
+from docx import document
+import pymysql
+import re
+
 
 from setpath import *
 from utils import determine_file_type
 from GPT.GPT import chat
 
+from waterMark import Watermarker, WatermarkerStyles
+from predict import predict
+
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
+app.secret_key = 'SnapBird'
+conn = pymysql.connect(
+    host='localhost',
+    user='root',
+    password='Zqp021025',
+    database='SnapBird',
+    cursorclass=pymysql.cursors.DictCursor
+)
+
 
 fileNames = os.listdir(picPath)+os.listdir(pdfPath) + \
     os.listdir(pptPath)+os.listdir(excelPath)+os.listdir(wordPath)
@@ -29,9 +44,26 @@ print('current fileName:', fileNames)
 print('current fileType:', fileTypes)
 
 
-def get_pic_Type():  # 模型获取图片内容
-
-    return 'idCard'
+def get_pic_Type(image_path):  # 模型获取图片内容
+    try:
+        res = predict(image_path)
+        if res == 5:
+            return 'idCard'
+        elif res == 0:
+            return 'bill'
+        elif res == 7:
+            return 'driverLicense'
+        elif res == 3:
+            return 'train tickt'
+        elif res == 6:
+            return 'bankCard'
+        elif res == 4:
+            return 'businessLicense'
+        elif res == 2:
+            return 'document'
+    except Exception as e:
+        print('predict:', e)
+        return 'error'
 
 
 def get_files_base64_andRemove(directory):  # 从zip提取文件，转base64，并删除源文件
@@ -323,6 +355,8 @@ def gpt_chat():
                                     })
                 elif response['type'] == 'rejection':
                     return jsonify({'response': response['content'], 'results': []})
+                elif response['type'] == 'textAnswer':
+                    return jsonify({'response': response['content'], 'results': []})
             except Exception as e:
                 print('erro in serve/chat/response_processing', e)
                 return jsonify({'response': 'erro in serve/chat/response_processing', 'results': []})
@@ -514,6 +548,7 @@ def waterMarkRemove():
                     'file_name': str(random.randint(100, 999))+filename,
                     'res': res
                 })
+                print(res)
             else:
                 print('something went wrong with all/waterMarkRemove.')
         except Exception as e:
@@ -1064,7 +1099,7 @@ def id_card():
     })
 
 
-@app.route('/type_query', methods=['GET'])  # 通用票据识别image->文本
+@app.route('/type_query', methods=['GET'])  # 判别类型
 def type_query():
     try:
         files = os.listdir(modelTempPath)
@@ -1080,7 +1115,7 @@ def type_query():
 
     file_path = os.path.join(dirpath, files[0])
     try:
-        texts = get_pic_Type()
+        texts = get_pic_Type(file_path)
         if texts:
             results.append({
                 'file_name': str(random.randint(100, 999))+files[0],
@@ -1099,6 +1134,195 @@ def type_query():
         'message': 'Files processed successfully',
         'results': results
     })
+
+
+@app.route('/bank_card', methods=['GET'])  # 通用票据识别image->文本
+def bankCard():
+    try:
+        files = os.listdir(modelTempPath)
+        if not files:
+            files = os.listdir(picPath)
+            dirpath = picPath
+        else:
+            dirpath = modelTempPath
+    except Exception as e:
+        return jsonify({'message': 'Error listing input directory', 'error': str(e)})
+
+    results = []
+
+    for i, filename in enumerate(files):
+        file_path = os.path.join(dirpath, filename)
+        try:
+            common_ocr = CommonOcr(file_path)
+            texts = common_ocr.bankCard()
+            if texts:
+                results.append({
+                    'file_name': str(random.randint(100, 999))+filename+'.string',
+                    'res': [texts]
+                })
+            else:
+                print('something went wrong with main/bankcard.')
+        except Exception as e:
+            print(f"Error processing file {filename}: {e}")
+            results.append({
+                'file_name': filename,
+                'error': str(e)
+            })
+    return jsonify({
+        'message': 'Files processed successfully',
+        'results': results
+    })
+
+
+@app.route('/driver_license', methods=['GET'])  # 通用票据识别image->文本
+def driverLicense():
+    try:
+        files = os.listdir(modelTempPath)
+        if not files:
+            files = os.listdir(picPath)
+            dirpath = picPath
+        else:
+            dirpath = modelTempPath
+    except Exception as e:
+        return jsonify({'message': 'Error listing input directory', 'error': str(e)})
+
+    results = []
+
+    for i, filename in enumerate(files):
+        file_path = os.path.join(dirpath, filename)
+        try:
+            common_ocr = CommonOcr(file_path)
+            texts = common_ocr.driverLicense()
+            if texts:
+                results.append({
+                    'file_name': str(random.randint(100, 999))+filename+'.string',
+                    'res': [texts]
+                })
+            else:
+                print('something went wrong with main/driverlicense.')
+        except Exception as e:
+            print(f"Error processing file {filename}: {e}")
+            results.append({
+                'file_name': filename,
+                'error': str(e)
+            })
+    return jsonify({
+        'message': 'Files processed successfully',
+        'results': results
+    })
+
+
+@app.route('/waterMarker', methods=['GET'])  # 加水印image->image
+def waterMarker():
+    text = request.args.get('text')
+    results = []
+    try:
+        files = os.listdir(modelTempPath)
+        if not files:
+            files = os.listdir(picPath)  # 列出目录下所有文件
+            dirpath = picPath
+        else:
+            dirpath = modelTempPath
+    except Exception as e:
+        return jsonify({'message': 'Error listing input directory', 'error': str(e)})
+    for i, filename in enumerate(files):
+        file_path = os.path.join(dirpath, filename)
+        outputTempPath = os.path.join(tempPath, filename)
+        try:
+            Watermarker(file_path, text,
+                        WatermarkerStyles.CENTRAL).save(outputTempPath)
+            with open(outputTempPath, 'rb') as file:
+                file_content = file.read()
+            res = base64.b64encode(file_content).decode('utf-8')
+            os.remove(outputTempPath)
+            if res:
+                results.append({
+                    'file_name': str(random.randint(100, 999))+filename,
+                    'res': res
+                })
+            else:
+                print('something went wrong with all/waterMarker.')
+        except Exception as e:
+            print(f"Error processing file {filename}: {e}")
+            results.append({
+                'file_name': str(random.randint(100, 999))+filename,
+                'error': str(e)
+            })
+    return jsonify({
+        'message': 'Files processed successfully',
+        'results': results
+    })
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    message = ''
+    if request.method == 'POST' and 'email' in request.json and 'password' in request.json:
+        email = request.json['email']
+        password = request.json['password']
+        try:
+            with conn.cursor() as cursor:
+                # 查询用户信息
+                cursor.execute(
+                    'SELECT * FROM user WHERE email = %s AND password = %s', (email, password,))
+                user = cursor.fetchone()
+                if user:
+                    # 登录成功，设置session
+                    # session['loggedin'] = True
+                    # session['name'] = user['name']
+                    # session['email'] = user['email']
+                    message = '登录成功！'
+                    name = user['name']
+                    return jsonify({'message': message, 'error': '', 'name': name})
+                else:
+                    message = '请输入正确的邮箱和密码！'
+        except Exception as e:
+            # 处理数据库操作过程中出现的异常
+            message = str(e)
+    else:
+        message = '无效的请求！'
+    return jsonify({'message': message, 'error': ''})
+
+
+@app.route('/logout')
+def logout():
+    session.pop('loggedin', None)
+    session.pop('userid', None)
+    session.pop('email', None)
+    return jsonify({'message': 'logout', 'error': ''})
+
+
+@app.route('/register', methods=['POST'])
+def register():
+    message = ''
+    if request.method == 'POST' and 'name' in request.json and 'password' in request.json and 'email' in request.json:
+        userName = request.json['name']
+        password = request.json['password']
+        email = request.json['email']
+        vip = 0
+        try:
+            with conn.cursor() as cursor:
+                # 查询是否已存在相同邮箱的账户
+                cursor.execute('SELECT * FROM user WHERE email = %s', (email,))
+                account = cursor.fetchone()
+                if account:
+                    message = '账户已存在！'
+                elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+                    message = '无效的邮箱地址！'
+                elif not userName or not password or not email:
+                    message = '请填写完整信息！'
+                else:
+                    # 插入新用户信息
+                    cursor.execute('INSERT INTO user (name, email, password, vip) VALUES (%s, %s, %s, %s)',
+                                   (userName, email, password, vip,))
+                    conn.commit()
+                    message = '注册成功！'
+        except Exception as e:
+            # 处理数据库操作过程中出现的异常
+            message = str(e)
+    else:
+        message = '无效的请求！'
+    return jsonify({'message': message})
 
 
 if __name__ == '__main__':

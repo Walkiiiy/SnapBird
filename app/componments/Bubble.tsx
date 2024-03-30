@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
   },
   receiverBubble: {
-    backgroundColor: '#0a5c5c',
+    backgroundColor: '#2f4f4f',
     alignSelf: 'flex-start',
   },
   text: {

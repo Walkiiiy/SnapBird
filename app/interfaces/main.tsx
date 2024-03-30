@@ -1,5 +1,6 @@
 import axios from 'axios';
 import RNFS from 'react-native-fs';
+
 const url = 'http://10.0.2.2:5000/';
 
 export async function ocrInterface() {
@@ -65,6 +66,39 @@ export async function idCard() {
     console.log(error);
   }
 }
+export async function bankCard() {
+  console.log('main:bankCard');
+  const Url = url + 'bank_card';
+  try {
+    // 发送GET请求到指定的URL
+    const response = await axios.get(Url);
+    if (response.data.message == 'Files processed successfully') {
+      console.log(response.data.results);
+      return response.data.results; //例：{"file_name": "1000000049.png", "texts": ["中国原指华夏族的发源地
+    } else {
+      return 'server returned a bad signal!';
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+export async function driverLicense() {
+  console.log('main:driverLicense');
+  const Url = url + 'driver_license';
+  try {
+    // 发送GET请求到指定的URL
+    const response = await axios.get(Url);
+    if (response.data.message == 'Files processed successfully') {
+      console.log(response.data.results);
+      return response.data.results; //例：{"file_name": "1000000049.png", "texts": ["中国原指华夏族的发源地
+    } else {
+      return 'server returned a bad signal!';
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export async function tableInterface() {
   console.log('main:table recognize');
   const Url = url + 'tableRecognize';
@@ -380,6 +414,78 @@ export async function typeQuery() {
   }
 }
 
+export async function WaterMarker(text: string) {
+  console.log('main:waterMarker');
+  const Url = url + 'waterMarker?text=' + text;
+  try {
+    const response = await axios.get(Url);
+    //存储文件到内部
+    // for (let i in response.data.results) {
+    //   paths.push(
+    //     saveFile(
+    //       response.data.results[i].file_name,
+    //       response.data.results[i].res,
+    //     ),
+    //   );
+    // }
+    return response.data.results;
+  } catch (error) {
+    // Handle errors here
+    console.error('Error fetching the pic file: ', error);
+    throw error; // Rethrow or handle as needed
+  }
+}
+export async function register(name, password, email) {
+  try {
+    // 发送 POST 请求到注册接口
+    const response = await axios.post(url + '/register', {
+      name: name,
+      password: password,
+      email: email,
+    });
+
+    // 处理响应结果
+    const data = response.data;
+    if (response.status === 200) {
+      // 注册成功
+      console.log(data.message);
+      return 1;
+      // 执行页面跳转或其他操作
+    } else {
+      // 注册失败
+      console.error(data.message);
+      // 提示用户注册失败信息
+      return 0;
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    // 处理请求错误
+  }
+}
+
+export async function login(password, email) {
+  try {
+    // 发送 POST 请求到注册接口
+    const response = await axios.post(url + '/login', {
+      password: password,
+      email: email,
+    });
+
+    // 处理响应结果
+    const data = response.data;
+    if (response.status === 200) {
+      console.log(data.name);
+      return data.name;
+      // 执行页面跳转或其他操作
+    } else {
+      console.error(data.message);
+      return 0;
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    // 处理请求错误
+  }
+}
 function getFileExtension(filePath) {
   // 按点分割字符串，然后取最后一个元素作为扩展名
   const parts = filePath.split('.');

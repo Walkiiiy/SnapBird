@@ -27,6 +27,7 @@ import ShowMoreButton from '../componments/ShowMoreButton';
 import AllFunctionsModal from '../componments/AllFunctionsModal';
 import TextBox from '../componments/TextBox';
 import Bubble from '../componments/Bubble';
+import QueryModal from '../componments/QueryModal';
 
 import {
   UserContext,
@@ -55,15 +56,262 @@ import {
   businessLicense,
   idCard,
   typeQuery,
+  WaterMarker,
+  bankCard,
+  driverLicense,
 } from '../interfaces/main';
 
 export default function HomeScreen({navigation}) {
+  const defaultOptions = [
+    {
+      id: '1',
+      label: '通用文字识别',
+      introImage1: require('../assets/icons/pic-gray.png'),
+      introImage2: require('../assets/icons/text-gray.png'),
+    },
+    {
+      id: '2',
+      label: '图像切边增强',
+      introImage1: require('../assets/icons/pic-gray.png'),
+      introImage2: require('../assets/icons/pic-gray.png'),
+    },
+    {
+      id: '3',
+      label: '通用表格识别',
+      introImage1: require('../assets/icons/pic-gray.png'),
+      introImage2: require('../assets/icons/excel-gray.png'),
+    },
+    {
+      id: '4',
+      label: '图像水印去除',
+      introImage1: require('../assets/icons/pic-gray.png'),
+      introImage2: require('../assets/icons/pic-gray.png'),
+    },
+    {
+      id: '5',
+      label: 'word转图片',
+      introImage1: require('../assets/icons/word-gray.png'),
+      introImage2: require('../assets/icons/pic-gray.png'),
+    },
+    {
+      id: '6',
+      label: '图片转pdf',
+      introImage1: require('../assets/icons/pic-gray.png'),
+      introImage2: require('../assets/icons/pdf-ppt-gray.png'),
+    },
+    {
+      id: '7',
+      label: 'excel转pdf',
+      introImage1: require('../assets/icons/excel-gray.png'),
+      introImage2: require('../assets/icons/pdf-ppt-gray.png'),
+    },
+    {
+      id: '8',
+      label: 'word转pdf',
+      introImage1: require('../assets/icons/word-gray.png'),
+      introImage2: require('../assets/icons/pdf-ppt-gray.png'),
+    },
+    {
+      id: '9',
+      label: 'pdf转图片',
+      introImage1: require('../assets/icons/pdf-ppt-gray.png'),
+      introImage2: require('../assets/icons/pic-gray.png'),
+    },
+    {
+      id: '10',
+      label: 'pdf转ppt',
+      introImage1: require('../assets/icons/pdf-ppt-gray.png'),
+      introImage2: require('../assets/icons/pdf-ppt-gray.png'),
+    },
+    {
+      id: '11',
+      label: 'pdf转excel',
+      introImage1: require('../assets/icons/pdf-ppt-gray.png'),
+      introImage2: require('../assets/icons/excel-gray.png'),
+    },
+    {
+      id: '12',
+      label: 'pdf转word',
+      introImage1: require('../assets/icons/pdf-ppt-gray.png'),
+      introImage2: require('../assets/icons/word-gray.png'),
+    },
+    {
+      id: '13',
+      label: '图片转word',
+      introImage1: require('../assets/icons/pic-gray.png'),
+      introImage2: require('../assets/icons/word-gray.png'),
+    },
+    {
+      id: '14',
+      label: '图像信息提取',
+      introImage1: require('../assets/icons/pic-gray.png'),
+      introImage2: require('../assets/icons/text-gray.png'),
+    },
+    {
+      id: '15',
+      label: '通用票据识别',
+      introImage1: require('../assets/icons/pic-gray.png'),
+      introImage2: require('../assets/icons/text-gray.png'),
+    },
+    {
+      id: '16',
+      label: '营业执照识别',
+      introImage1: require('../assets/icons/pic-gray.png'),
+      introImage2: require('../assets/icons/text-gray.png'),
+    },
+    {
+      id: '17',
+      label: '身份证识别',
+      introImage1: require('../assets/icons/pic-gray.png'),
+      introImage2: require('../assets/icons/text-gray.png'),
+    },
+    {
+      id: '18',
+      label: '图像添加水印',
+      introImage1: require('../assets/icons/pic-gray.png'),
+      introImage2: require('../assets/icons/pic-gray.png'),
+    },
+    {
+      id: '19',
+      label: '银行卡识别',
+      introImage1: require('../assets/icons/pic-gray.png'),
+      introImage2: require('../assets/icons/text-gray.png'),
+    },
+    {
+      id: '20',
+      label: '驾驶证识别',
+      introImage1: require('../assets/icons/pic-gray.png'),
+      introImage2: require('../assets/icons/text-gray.png'),
+    },
+  ];
   // 动态变量
   const {user, setUser} = React.useContext(UserContext);
   const {fileOutcome, setFileOutcome} = React.useContext(FileOutcomeContext);
   const {fileUpload, setFileUpload} = React.useContext(FileUploadContext);
   const {fileType, setFileType} = React.useContext(FileTypeContext);
 
+  const [options, setOptions] = React.useState([
+    {
+      id: '1',
+      label: '通用文字识别',
+      introImage1: require('../assets/icons/pic-gray.png'),
+      introImage2: require('../assets/icons/text-gray.png'),
+    },
+    {
+      id: '2',
+      label: '图像切边增强',
+      introImage1: require('../assets/icons/pic-gray.png'),
+      introImage2: require('../assets/icons/pic-gray.png'),
+    },
+    {
+      id: '3',
+      label: '通用表格识别',
+      introImage1: require('../assets/icons/pic-gray.png'),
+      introImage2: require('../assets/icons/excel-gray.png'),
+    },
+    {
+      id: '4',
+      label: '图像水印去除',
+      introImage1: require('../assets/icons/pic-gray.png'),
+      introImage2: require('../assets/icons/pic-gray.png'),
+    },
+    {
+      id: '5',
+      label: 'word转图片',
+      introImage1: require('../assets/icons/word-gray.png'),
+      introImage2: require('../assets/icons/pic-gray.png'),
+    },
+    {
+      id: '6',
+      label: '图片转pdf',
+      introImage1: require('../assets/icons/pic-gray.png'),
+      introImage2: require('../assets/icons/pdf-ppt-gray.png'),
+    },
+    {
+      id: '7',
+      label: 'excel转pdf',
+      introImage1: require('../assets/icons/excel-gray.png'),
+      introImage2: require('../assets/icons/pdf-ppt-gray.png'),
+    },
+    {
+      id: '8',
+      label: 'word转pdf',
+      introImage1: require('../assets/icons/word-gray.png'),
+      introImage2: require('../assets/icons/pdf-ppt-gray.png'),
+    },
+    {
+      id: '9',
+      label: 'pdf转图片',
+      introImage1: require('../assets/icons/pdf-ppt-gray.png'),
+      introImage2: require('../assets/icons/pic-gray.png'),
+    },
+    {
+      id: '10',
+      label: 'pdf转ppt',
+      introImage1: require('../assets/icons/pdf-ppt-gray.png'),
+      introImage2: require('../assets/icons/pdf-ppt-gray.png'),
+    },
+    {
+      id: '11',
+      label: 'pdf转excel',
+      introImage1: require('../assets/icons/pdf-ppt-gray.png'),
+      introImage2: require('../assets/icons/excel-gray.png'),
+    },
+    {
+      id: '12',
+      label: 'pdf转word',
+      introImage1: require('../assets/icons/pdf-ppt-gray.png'),
+      introImage2: require('../assets/icons/word-gray.png'),
+    },
+    {
+      id: '13',
+      label: '图片转word',
+      introImage1: require('../assets/icons/pic-gray.png'),
+      introImage2: require('../assets/icons/word-gray.png'),
+    },
+    {
+      id: '14',
+      label: '图像信息提取',
+      introImage1: require('../assets/icons/pic-gray.png'),
+      introImage2: require('../assets/icons/text-gray.png'),
+    },
+    {
+      id: '15',
+      label: '通用票据识别',
+      introImage1: require('../assets/icons/pic-gray.png'),
+      introImage2: require('../assets/icons/text-gray.png'),
+    },
+    {
+      id: '16',
+      label: '营业执照识别',
+      introImage1: require('../assets/icons/pic-gray.png'),
+      introImage2: require('../assets/icons/text-gray.png'),
+    },
+    {
+      id: '17',
+      label: '身份证识别',
+      introImage1: require('../assets/icons/pic-gray.png'),
+      introImage2: require('../assets/icons/text-gray.png'),
+    },
+    {
+      id: '18',
+      label: '图像添加水印',
+      introImage1: require('../assets/icons/pic-gray.png'),
+      introImage2: require('../assets/icons/pic-gray.png'),
+    },
+    {
+      id: '19',
+      label: '银行卡识别',
+      introImage1: require('../assets/icons/pic-gray.png'),
+      introImage2: require('../assets/icons/text-gray.png'),
+    },
+    {
+      id: '20',
+      label: '驾驶证识别',
+      introImage1: require('../assets/icons/pic-gray.png'),
+      introImage2: require('../assets/icons/text-gray.png'),
+    },
+  ]);
   const [text, setText] = React.useState('');
   const [modalVisible, setModalVisible] = React.useState(true);
   const [allFunctionsVisible, setAllFunctionsVisible] = React.useState(false);
@@ -76,6 +324,7 @@ export default function HomeScreen({navigation}) {
   const [shortCutIntroVisible, setShortCutIntroVisible] = React.useState(false);
   const [showPrompt, setShowPrompt] = React.useState(false);
   const [prompt, setPrompt] = React.useState('');
+  const [showQueryModal, setShowQueryModal] = React.useState(false);
   const [showActivativeIndicator, setShowActivativeIndicator] =
     React.useState(false);
   //键盘事件监听
@@ -114,6 +363,15 @@ export default function HomeScreen({navigation}) {
     }, []),
   );
   // 自定函数
+  function moveOptionEleToHead(elements) {
+    setOptions(options => {
+      const newoptions = [];
+      for (let i in elements) {
+        newoptions.push(defaultOptions[elements[i]]);
+      }
+      return newoptions;
+    });
+  }
   function getFileType(fileName) {
     const extension = fileName.split('.').pop().toLowerCase();
     switch (extension) {
@@ -148,6 +406,8 @@ export default function HomeScreen({navigation}) {
         firstMessage: '你能做什么？',
         fileUploadPass: fileUpload,
       });
+    } else if (id == 0) {
+      navigation.navigate('Me');
     }
   }
   function wait(ms) {
@@ -155,14 +415,22 @@ export default function HomeScreen({navigation}) {
   }
   //处理shortcut选择,转ai界面
   async function shortCut(message: string) {
+    setShowPrompt(false);
     console.log(`Selected option : ${message}`);
     console.log(`Selected option : ${message}`);
-    setTitle2('Snap！！');
-    await wait(300);
-    navigation.navigate('Chat', {
-      firstMessage: message,
-      fileUploadPass: fileUpload,
-    });
+    if (fileUpload.length == 0) {
+      setTitle1('请先上传图片或文件！！');
+      setUploadMenuVisible(!uploadMenuVisible);
+      await wait(1500);
+      setTitle1('快速开始');
+    } else {
+      setTitle2('Snap！！');
+      await wait(300);
+      navigation.navigate('Chat', {
+        firstMessage: message,
+        fileUploadPass: fileUpload,
+      });
+    }
   }
   //处理快速开始选择
   async function quickStart(option: string) {
@@ -228,6 +496,14 @@ export default function HomeScreen({navigation}) {
       } else if (option == '身份证识别') {
         const res = await idCard();
         setFileOutcome(fileOutcome => fileOutcome.concat(res));
+      } else if (option == '图像添加水印') {
+        setShowQueryModal(true);
+      } else if (option == '银行卡识别') {
+        const res = await bankCard();
+        setFileOutcome(fileOutcome => fileOutcome.concat(res));
+      } else if (option == '驾驶证识别') {
+        const res = await driverLicense();
+        setFileOutcome(fileOutcome => fileOutcome.concat(res));
       } else {
         console.log('unknown function');
       }
@@ -248,12 +524,14 @@ export default function HomeScreen({navigation}) {
   }
   //从图片uri列表和outcome列表删除元素
   function delfile(index) {
+    setShowPrompt(false);
     setFileUpload(currentFileUploads => {
       const tempArray = [...currentFileUploads];
       if (index >= 0 && index < tempArray.length) {
         tempArray.splice(index, 1);
         if (tempArray.length === 0) {
           setPicVisible(false);
+          setOptions(defaultOptions);
         }
       }
       return tempArray;
@@ -291,11 +569,59 @@ export default function HomeScreen({navigation}) {
     if (type == 'Image') {
       let typeRes = await typeQuery();
       typeRes = typeRes[0].res[0];
-      setPrompt(typeRes);
+      if (typeRes == 'idCard') {
+        const content =
+          '你似乎上传了身份证照片，你可以在"快速开始"中试试：\n"身份证识别"\n"图片转pdf"\n"图像切边增强"\n"图像水印去除"\n"图像添加水印"\n"图像水印去除"\n或者在ai助手中提出更复杂的功能需求';
+        setPrompt(content);
+        moveOptionEleToHead([16, 17, 13, 12, 5, 3, 1]);
+      } else if (typeRes == 'bill') {
+        const content =
+          '你似乎上传了发票，你可以在"快速开始"中试试：\n"通用票据识别"\n"图片转pdf"\n"图像切边增强"\n"图像水印去除"\n"图像水印去除"\n"图像添加水印"\n或者在ai助手中提出更复杂的功能需求';
+        setPrompt(content);
+        moveOptionEleToHead([14, 17, 13, 12, 5, 3, 1]);
+      } else if (typeRes == 'driverLicense') {
+        const content =
+          '你似乎上传了驾驶证，你可以在"快速开始"中试试：\n"驾驶证识别"\n"图片转pdf"\n"图像切边增强"\n"图像水印去除"\n"图像水印去除"\n"图像添加水印"\n或者在ai助手中提出更复杂的功能需求';
+        setPrompt(content);
+        moveOptionEleToHead([19, 17, 13, 12, 5, 3, 1]);
+      } else if (typeRes == 'train tickt') {
+        const content =
+          '你似乎上传了火车票，你可以在"快速开始"中试试：\n"通用票据识别"\n"图片转pdf"\n"图像切边增强"\n"图像水印去除"\n"图像水印去除"\n"图像添加水印"\n或者在ai助手中提出更复杂的功能需求';
+        setPrompt(content);
+        moveOptionEleToHead([14, 17, 13, 12, 5, 3, 1]);
+      } else if (typeRes == 'bankCard') {
+        const content =
+          '你似乎上传了银行卡，你可以在"快速开始"中试试：\n"银行卡识别"\n"图片转pdf"\n"图像切边增强"\n"图像水印去除"\n"图像水印去除"\n"图像添加水印"\n或者在ai助手中提出更复杂的功能需求';
+        setPrompt(content);
+        moveOptionEleToHead([18, 17, 13, 12, 5, 3, 1]);
+      } else if (typeRes == 'businessLicense') {
+        const content =
+          '你似乎上传了营业执照，你可以在"快速开始"中试试：\n"营业执照识别"\n"图片转pdf"\n"图像切边增强"\n"图像水印去除"\n"图像水印去除"\n"图像添加水印"\n或者在ai助手中提出更复杂的功能需求';
+        setPrompt(content);
+        moveOptionEleToHead([15, 17, 13, 12, 5, 3, 1]);
+      } else if (typeRes == 'document') {
+        const content =
+          '你似乎上传了文档照片，你可以在"快速开始"中试试：\n"图片转pdf"\n"图像切边增强"\n"图像水印去除"\n"图像水印去除"\n"图像添加水印"\n或者在ai助手中提出更复杂的功能需求';
+        setPrompt(content);
+      } else if (typeRes == 'error') {
+        const content = '似乎无法判别您上传的图片内容哦';
+        setPrompt(content);
+      }
     } else if (type == 'Excel Spreadsheet') {
+      const content =
+        '你似乎上传了excel文件，你可以在"快速开始"中试试：\n"excel转pdf"\n或者在ai助手中提出更复杂的功能需求';
+      setPrompt(content);
     } else if (type == 'Word Document') {
+      const content =
+        '你似乎上传了word文件，你可以在"快速开始"中试试：\n"word转图片"\n"word转pdf"\n或者在ai助手中提出更复杂的功能需求';
+      setPrompt(content);
     } else if (type == 'PDF Document') {
+      const content =
+        '你似乎上传了pdf文件，你可以在"快速开始"中试试：\n"pdf转图片"\n"pdf转ppt"\n"pdf转excel"\n"pdf转word"\n或者在ai助手中提出更复杂的功能需求';
+      setPrompt(content);
     } else if (type == 'PowerPoint Presentation') {
+      const content = '我们目前不支持对ppt文件的直接操作哦。';
+      setPrompt(content);
     }
     //添加其他情况
     setShowPrompt(true);
@@ -398,7 +724,13 @@ export default function HomeScreen({navigation}) {
       uri: picuri,
     });
   }
-
+  async function waterMarkerFunc(text: string) {
+    setShowQueryModal(false);
+    setShowActivativeIndicator(true);
+    const res = await WaterMarker(text);
+    setFileOutcome(fileOutcome => fileOutcome.concat(res));
+    setShowActivativeIndicator(false);
+  }
   //home视图
   return (
     <View style={styles.container}>
@@ -420,10 +752,19 @@ export default function HomeScreen({navigation}) {
         visible={allFunctionsVisible}
         onClose={() => setAllFunctionsVisible(false)}
       />
+      <QueryModal
+        prompt="添加的水印："
+        visible={showQueryModal}
+        onConfirm={waterMarkerFunc}
+        onCancel={() => {
+          setShowQueryModal(false);
+        }}
+      />
       <SideMenu
         visible={menuVisible}
         onClose={() => setMenuVisible(false)}
         onChoose={onChooseSideMenu}
+        userName={user}
       />
 
       {/* 顶部标题栏，菜单按钮 */}
@@ -613,7 +954,7 @@ export default function HomeScreen({navigation}) {
           />
         </View>
         <View style={styles.selectionArea}>
-          <Functions handleSelect={quickStart} />
+          <Functions handleSelect={quickStart} options={options} />
         </View>
       </View>
 
